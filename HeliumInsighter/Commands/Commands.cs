@@ -6,8 +6,27 @@ namespace HeliumInsighter.Commands;
 public static class Commands
 {
     static readonly int MaxHotspot = 100;
-    static readonly int SearchRadiusKm = 5;
-    private static bool CancelKeyPressed = false;
+    static readonly int SearchRadiusKm = 10;
+    private static bool _cancelKeyPressed;
+
+    public static async Task FrontSemiCircleBeaconStats(FrontCommand options)
+    {
+        Console.WriteLine("Staring Front Semi-Circle Beacon Stats...");
+
+        var lastDay = DateTime.UtcNow.AddHours(-options.pastHours);
+
+        var myHotspot = await HotspotService.GetHotspot(options.hotspotId);
+        var hotspots = await HotspotService.GetHotspotsByRadius(myHotspot.Lat, myHotspot.Lng, SearchRadiusKm);
+        var frontHotspots = hotspots.Where(hotspot =>
+        {
+            var bearing = Extensions.DegreeBearing(myHotspot.Lat, myHotspot.Lng, hotspot.Lat, hotspot.Lng);
+            return (bearing > 0 && bearing <= 90) || (bearing >= 270 && bearing < 360);
+        }).ToArray();
+        Console.WriteLine(
+            $"There are {frontHotspots.Length} hotspots in the front of me, in {SearchRadiusKm}km radius");
+
+        await BeaconStats(frontHotspots, myHotspot, lastDay);
+    }
 
     public static async Task BoxBeaconStats(string hotspotId)
     {
@@ -46,25 +65,6 @@ public static class Commands
         await BeaconStats(hotspots.ToArray(), myHotspot, lastDay);
     }
 
-    public static async Task FrontSemiCircleBeaconStats(string hotspotId)
-    {
-        Console.WriteLine("Staring Front Semi-Circle Beacon Stats...");
-
-        var lastDay = DateTime.UtcNow.AddDays(-1);
-
-        var myHotspot = await HotspotService.GetHotspot(hotspotId);
-        var hotspots = await HotspotService.GetHotspotsByRadius(myHotspot.Lat, myHotspot.Lng, SearchRadiusKm);
-        var frontHotspots = hotspots.Where(hotspot =>
-        {
-            var bearing = Extensions.DegreeBearing(myHotspot.Lat, myHotspot.Lng, hotspot.Lat, hotspot.Lng);
-            return (bearing > 0 && bearing <= 90) || (bearing >= 270 && bearing < 360);
-        }).ToArray();
-        Console.WriteLine(
-            $"There are {frontHotspots.Length} hotspots in the front of me, in {SearchRadiusKm}km radius");
-
-        await BeaconStats(frontHotspots, myHotspot, lastDay);
-    }
-
     private static async Task BeaconStats(Hotspot[] hotspots, Hotspot myHotspot, DateTime minTime)
     {
         var challenges = await HotspotService.GetChallenges(myHotspot.Address, minTime);
@@ -79,28 +79,28 @@ public static class Commands
         Console.WriteLine($"let's check {workingCount} of my surrounding hotspots' beacons");
 
         AttachCtrlC();
-        
+
         var totalCount = 0;
         var totalHitCount = 0;
         var totalMissedCount = 0;
         for (var i = 0; i < workingCount; i++)
         {
+            if (_cancelKeyPressed)
+            {
+                Console.WriteLine("Ctrl + C");
+                break;
+            }
+
+
             var hotspot = hotspots[i];
             if (hotspot.Address.Equals(myHotspot.Address))
             {
                 continue;
             }
 
-            if (CancelKeyPressed)
-            {
-                Console.WriteLine("Ctrl + C");
-                break;
-            }
-
             var bearing = Extensions.DegreeBearing(myHotspot.Lat, myHotspot.Lng, hotspot.Lat, hotspot.Lng);
             var bearingDirection = Extensions.ToDirection(bearing);
             var distance = Extensions.CalculateDistance(myHotspot, hotspot);
-
             Console.Write($"{i + 1}. {hotspot.ToString()}");
             Console.Write($"({distance.ToString("F1")}m/{bearingDirection}/{bearing.ToString("0")}°) ... ");
 
@@ -120,8 +120,8 @@ public static class Commands
             totalCount += beacons.Count;
         }
 
-        Console.WriteLine("---");
-        Console.WriteLine($"Total: {totalCount} , Witnessed: {totalHitCount} , Missed: {totalMissedCount}");
+        Console.WriteLine("--- beacon statistics ---");
+        Console.WriteLine($"total: {totalCount} , witnessed: {totalHitCount} , missed: {totalMissedCount}");
     }
 
     private static void AttachCtrlC()
@@ -129,7 +129,7 @@ public static class Commands
         Console.CancelKeyPress += (sender, args) =>
         {
             args.Cancel = true;
-            CancelKeyPressed = true;
+            _cancelKeyPressed = true;
         };
     }
 }
