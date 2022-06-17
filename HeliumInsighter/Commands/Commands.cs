@@ -10,7 +10,7 @@ public static class Commands
 
     public static async Task FrontSemiCircleBeaconStats(FrontCommand options)
     {
-        Console.WriteLine($"Staring Front Semi-Circle Beacon Stats for the past {options.past} minutes ...");
+        Console.WriteLine($"front semi-circle beacon stats for the past {options.past} minutes ...");
 
         var minDateTime = DateTime.UtcNow.AddMinutes(-options.past);
 
@@ -29,7 +29,7 @@ public static class Commands
 
     public static async Task BoxBeaconStats(BoxCommand options)
     {
-        Console.WriteLine("Staring Box Beacon Stats...");
+        Console.WriteLine($"box beacon stats for the past {options.past} minutes ...");
 
         var minDateTime = DateTime.UtcNow.AddMinutes(-options.past);
 
@@ -53,7 +53,7 @@ public static class Commands
 
     public static async Task RadiusBeaconStats(RadiusCommand options)
     {
-        Console.WriteLine($"Staring Radius Beacon Stats for the past {options.past} minutes ...");
+        Console.WriteLine($"radius beacon stats for the past {options.past} minutes ...");
 
         var minDateTime = DateTime.UtcNow.AddMinutes(-options.past);
 
@@ -119,6 +119,7 @@ public static class Commands
             totalCount += beacons.Count;
         }
 
+        Console.WriteLine("");
         Console.WriteLine("--- beacon statistics ---");
         Console.WriteLine($"total: {totalCount} , witnessed: {totalHitCount} , missed: {totalMissedCount}");
     }
@@ -171,6 +172,7 @@ public static class Commands
             totalCount += beacons.Count;
         }
 
+        Console.WriteLine("");
         Console.WriteLine("--- beacon statistics ---");
         Console.WriteLine($"total: {totalCount} , witnessed: {totalHitCount} , missed: {totalMissedCount}");
     }
