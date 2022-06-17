@@ -18,14 +18,7 @@ public static class HeliumClient
     private static async Task<HttpResponseMessage> PollyGet(Func<Task<HttpResponseMessage>> func)
     {
         return await Policy.HandleResult<HttpResponseMessage>(r => r.StatusCode == HttpStatusCode.TooManyRequests)
-            .WaitAndRetryAsync(new[]
-            {
-                TimeSpan.FromSeconds(10),
-                TimeSpan.FromSeconds(15),
-                TimeSpan.FromSeconds(20),
-                TimeSpan.FromSeconds(25),
-                TimeSpan.FromSeconds(30),
-            }).ExecuteAsync(func);
+            .WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(7 * retryAttempt)).ExecuteAsync(func);
     }
 
     public static async Task<List<string>> Get(string relativePath)

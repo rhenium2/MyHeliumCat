@@ -88,4 +88,11 @@ public static class HotspotService
         var allData = await HeliumClient.Get(uri);
         return Extensions.DeserializeAll<Hotspot>(allData.ToArray());
     }
+
+    public static async Task<List<Hotspot>> GetHotspotsByBox(double swLat, double swLon, double neLat, double neLon)
+    {
+        var uri = $"/v1/hotspots/location/box?swlat={swLat}&swlon={swLon}&nelat={neLat}&nelon={neLon}";
+        var allData = await HeliumClient.Get(uri);
+        return Extensions.DeserializeAll<Hotspot>(allData.ToArray());
+    }
 }
