@@ -24,7 +24,7 @@ public static class Constants
         new Maker { Name = "Bobcat 5G", Address = "14gqqPV2HEs4PCNNUacKVG7XeAhCUkN553NcBVw4xfwSFcCjhXv" },
         new Maker { Name = "Heltec Automation", Address = "14iC6N1HkqUjH7WEChHVQhPqJ1hbWBKpZXZVeHHykCA7tNDYF2C" },
         new Maker { Name = "Nebra Ltd", Address = "13Zni1he7KY9pUmkXMhEhTwfUpL9AcEV1m2UbbvFsrU9QPTMgE3" },
+        new Maker { Name = "ClodPi", Address = "13XuP2DjHEHVkKguDDZD2ev5AeqMLuJ8UQ44efEcDmVTnBcvc6F" },
         new Maker { Name = "", Address = "" },
-        
     };
 }

@@ -5,37 +5,36 @@ namespace HeliumInsighter.Commands;
 
 public static class Commands
 {
-    static readonly int MaxHotspot = 100;
-    static readonly int SearchRadiusKm = 10;
+    static readonly int MaxHotspot = 400;
     private static bool _cancelKeyPressed;
 
     public static async Task FrontSemiCircleBeaconStats(FrontCommand options)
     {
-        Console.WriteLine("Staring Front Semi-Circle Beacon Stats...");
+        Console.WriteLine($"Staring Front Semi-Circle Beacon Stats for the past {options.past} minutes ...");
 
-        var lastDay = DateTime.UtcNow.AddHours(-options.pastHours);
+        var minDateTime = DateTime.UtcNow.AddMinutes(-options.past);
 
-        var myHotspot = await HotspotService.GetHotspot(options.hotspotId);
-        var hotspots = await HotspotService.GetHotspotsByRadius(myHotspot.Lat, myHotspot.Lng, SearchRadiusKm);
+        var myHotspot = await HotspotService.GetHotspotByName(options.name);
+        var hotspots = await HotspotService.GetHotspotsByRadius(myHotspot.Lat, myHotspot.Lng, options.radius);
         var frontHotspots = hotspots.Where(hotspot =>
         {
             var bearing = Extensions.DegreeBearing(myHotspot.Lat, myHotspot.Lng, hotspot.Lat, hotspot.Lng);
             return (bearing > 0 && bearing <= 90) || (bearing >= 270 && bearing < 360);
         }).ToArray();
         Console.WriteLine(
-            $"There are {frontHotspots.Length} hotspots in the front of me, in {SearchRadiusKm}km radius");
+            $"There are {frontHotspots.Length} hotspots in front of me, in {options.radius}km semi-circle radius");
 
-        await BeaconStats(frontHotspots, myHotspot, lastDay);
+        await BeaconStats2(frontHotspots, myHotspot, minDateTime);
     }
 
-    public static async Task BoxBeaconStats(string hotspotId)
+    public static async Task BoxBeaconStats(BoxCommand options)
     {
         Console.WriteLine("Staring Box Beacon Stats...");
 
-        var lastDay = DateTime.UtcNow.AddDays(-1);
+        var minDateTime = DateTime.UtcNow.AddMinutes(-options.past);
 
-        var myHotspot = await HotspotService.GetHotspot(hotspotId);
-        var challenges = await HotspotService.GetWitnessed(hotspotId);
+        var myHotspot = await HotspotService.GetHotspotByName(options.name);
+        var challenges = await HotspotService.GetWitnessed(myHotspot.Address);
 
         // calculating witnessed box
         var allLats = challenges.Select(x => x.Lat).ToList();
@@ -49,20 +48,20 @@ public static class Commands
         Console.WriteLine(
             $"There are {hotspots.Count} hotspots in my witnessed box. SW({swLat}, {swLon}) and NE({neLat}, {neLon})");
 
-        await BeaconStats(hotspots.ToArray(), myHotspot, lastDay);
+        await BeaconStats2(hotspots.ToArray(), myHotspot, minDateTime);
     }
 
-    public static async Task RadiusBeaconStats(string hotspotId)
+    public static async Task RadiusBeaconStats(RadiusCommand options)
     {
-        Console.WriteLine("Staring Radius Beacon Stats...");
+        Console.WriteLine($"Staring Radius Beacon Stats for the past {options.past} minutes ...");
 
-        var lastDay = DateTime.UtcNow.AddDays(-1);
+        var minDateTime = DateTime.UtcNow.AddMinutes(-options.past);
 
-        var myHotspot = await HotspotService.GetHotspot(hotspotId);
-        var hotspots = await HotspotService.GetHotspotsByRadius(myHotspot.Lat, myHotspot.Lng, SearchRadiusKm);
-        Console.WriteLine($"There are {hotspots.Count} hotspots in the {SearchRadiusKm}km radius");
+        var myHotspot = await HotspotService.GetHotspotByName(options.name);
+        var hotspots = await HotspotService.GetHotspotsByRadius(myHotspot.Lat, myHotspot.Lng, options.radius);
+        Console.WriteLine($"There are {hotspots.Count} hotspots in the {options.radius}km radius");
 
-        await BeaconStats(hotspots.ToArray(), myHotspot, lastDay);
+        await BeaconStats2(hotspots.ToArray(), myHotspot, minDateTime);
     }
 
     private static async Task BeaconStats(Hotspot[] hotspots, Hotspot myHotspot, DateTime minTime)
@@ -105,6 +104,58 @@ public static class Commands
             Console.Write($"({distance.ToString("F1")}m/{bearingDirection}/{bearing.ToString("0")}°) ... ");
 
             var beacons = await HotspotService.GetBeaconTransactions(hotspot.Address, minTime);
+            if (!beacons.Any())
+            {
+                Console.WriteLine("no beacon");
+                continue;
+            }
+
+            var witnessedCount = beacons.Count(x => myWitnessedHashes.Contains(x.Hash));
+            var missedCount = beacons.Count - witnessedCount;
+            Console.WriteLine($"beacons: {beacons.Count}, witnessed: {witnessedCount}, missed: {missedCount}");
+
+            totalHitCount += witnessedCount;
+            totalMissedCount += missedCount;
+            totalCount += beacons.Count;
+        }
+
+        Console.WriteLine("--- beacon statistics ---");
+        Console.WriteLine($"total: {totalCount} , witnessed: {totalHitCount} , missed: {totalMissedCount}");
+    }
+
+    private static async Task BeaconStats2(Hotspot[] hotspots, Hotspot myHotspot, DateTime minTime)
+    {
+        var challenges = await HotspotService.GetChallenges(minTime);
+        var myWitnessed =
+            challenges.Where(c => c.Path.Any()
+                                  && c.Path.First().Witnesses
+                                      .Any(x => x.IsValid && x.Gateway.Equals(myHotspot.Address)));
+        var myWitnessedHashes = myWitnessed.Select(x => x.Hash).ToList();
+
+        var beaconedHotspots =
+            hotspots.Where(h => challenges.Select(c => c.Path.First().Challengee).Contains(h.Address));
+
+        Console.WriteLine($"There has been {challenges.Count} beacons in the world");
+
+
+        var totalCount = 0;
+        var totalHitCount = 0;
+        var totalMissedCount = 0;
+        foreach (var hotspot in beaconedHotspots)
+        {
+            if (hotspot.Address.Equals(myHotspot.Address))
+            {
+                Console.WriteLine("I sent a beacon, hora!");
+                continue;
+            }
+
+            var bearing = Extensions.DegreeBearing(myHotspot.Lat, myHotspot.Lng, hotspot.Lat, hotspot.Lng);
+            var bearingDirection = Extensions.ToDirection(bearing);
+            var distance = Extensions.CalculateDistance(myHotspot, hotspot);
+            Console.Write($"- {hotspot.ToString()} ");
+            Console.Write($"({distance.ToString("F1")}m/{bearingDirection}/{bearing.ToString("0")}°) ... ");
+
+            var beacons = challenges.Where(c => c.Path.First().Challengee.Equals(hotspot.Address)).ToList();
             if (!beacons.Any())
             {
                 Console.WriteLine("no beacon");

@@ -14,6 +14,13 @@ public static class HotspotService
         return JsonConvert.DeserializeObject<Hotspot>(data.First());
     }
 
+    public static async Task<Hotspot> GetHotspotByName(string name)
+    {
+        var uri = $"/v1/hotspots/name/{name}";
+        var data = await HeliumClient.Get(uri);
+        return Extensions.DeserializeAll<Hotspot>(data.ToArray()).First();
+    }
+
     public static async Task<List<Hotspot>> GetWitnessed(string hotspotId)
     {
         var uri = $"/v1/hotspots/{hotspotId}/witnessed";
@@ -39,6 +46,18 @@ public static class HotspotService
     public static async Task<List<PocReceiptsTransaction>> GetChallenges(string hotspotId, DateTime? minTime)
     {
         var uri = $"/v1/hotspots/{hotspotId}/challenges";
+        if (minTime.HasValue)
+        {
+            uri += "?min_time=" + minTime.Value.ToString("o", CultureInfo.InvariantCulture);
+        }
+
+        var allData = await HeliumClient.Get(uri);
+        return Extensions.DeserializeAll<PocReceiptsTransaction>(allData.ToArray());
+    }
+
+    public static async Task<List<PocReceiptsTransaction>> GetChallenges(DateTime? minTime)
+    {
+        var uri = $"/v1/challenges";
         if (minTime.HasValue)
         {
             uri += "?min_time=" + minTime.Value.ToString("o", CultureInfo.InvariantCulture);

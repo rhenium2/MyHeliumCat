@@ -23,7 +23,27 @@ public static class HeliumClient
 
     public static async Task<List<string>> Get(string relativePath)
     {
+        var allData = new List<string>();
+        Response response = new Response();
+        do
+        {
+            response = await CallAndGetResponse(relativePath, response.Cursor);
+            if (!string.IsNullOrEmpty(response.Data))
+            {
+                allData.Add(response.Data);
+            }
+        } while (!string.IsNullOrEmpty(response.Cursor));
+
+        return allData;
+    }
+
+    private static async Task<Response> CallAndGetResponse(string relativePath, string cursor)
+    {
         var uri = baseUri + relativePath;
+        if (!string.IsNullOrEmpty(cursor))
+        {
+            uri += uri.Contains('?') ? $"&cursor={cursor}" : $"?cursor={cursor}";
+        }
 
         var responseMessage = await PollyGet(() => httpClient.GetAsync(uri));
         responseMessage.EnsureSuccessStatusCode();
@@ -40,37 +60,19 @@ public static class HeliumClient
             throw;
         }
 
-        var allData = new List<string>();
         var data = result["data"].ToJsonString();
-
-        // TODO: convert below to use yield 
-
+        var cursorString = result["cursor"]?.ToJsonString();
+        var response = new Response();
         if (!string.IsNullOrEmpty(data) && data != "[]")
         {
-            allData.Add(data);
+            response.Data = data;
         }
 
-        var cursorString = result["cursor"]?.ToJsonString();
         if (!string.IsNullOrEmpty(cursorString))
         {
-            var cursor = cursorString.Substring(1, cursorString.Length - 2);
-            uri += uri.Contains('?') ? $"&cursor={cursor}" : $"?cursor={cursor}";
-            responseMessage = await PollyGet(() => httpClient.GetAsync(uri));
-
-            content = await responseMessage.Content.ReadAsStringAsync();
-            try
-            {
-                result = JsonNode.Parse(content);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-
-            allData.Add(result["data"].ToJsonString());
+            response.Cursor = cursorString.Substring(1, cursorString.Length - 2);
         }
 
-        return allData;
+        return response;
     }
 }
