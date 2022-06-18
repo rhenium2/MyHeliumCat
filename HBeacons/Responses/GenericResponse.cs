@@ -1,4 +1,4 @@
-namespace HeliumInsighter.Responses;
+namespace HBeacons.Responses;
 
 public class GenericResponse<T>
 {

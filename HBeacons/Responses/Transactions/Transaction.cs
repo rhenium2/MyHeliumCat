@@ -1,4 +1,4 @@
-namespace HeliumInsighter.Responses.Transactions;
+namespace HBeacons.Responses.Transactions;
 
 public class Transaction
 {

@@ -1,9 +1,9 @@
 using System.Globalization;
-using HeliumInsighter.Responses;
-using HeliumInsighter.Responses.Transactions;
+using HBeacons.Responses;
+using HBeacons.Responses.Transactions;
 using Newtonsoft.Json;
 
-namespace HeliumInsighter.Services;
+namespace HBeacons.Services;
 
 public static class HotspotService
 {

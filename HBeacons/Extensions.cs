@@ -1,9 +1,9 @@
 using GeoCoordinatePortable;
-using HeliumInsighter.Responses;
+using HBeacons.Responses;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace HeliumInsighter;
+namespace HBeacons;
 
 public static class Extensions
 {

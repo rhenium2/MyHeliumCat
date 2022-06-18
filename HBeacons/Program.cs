@@ -1,5 +1,5 @@
 ﻿using CommandLine;
-using HeliumInsighter.Commands;
+using HBeacons.Commands;
 
 Console.WriteLine("Hello, World!");
 

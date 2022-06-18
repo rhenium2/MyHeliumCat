@@ -1,9 +1,9 @@
 using CommandLine;
 
-namespace HeliumInsighter.Commands;
+namespace HBeacons.Commands;
 
-[Verb("front", HelpText = "beacon stats of hotspots in front semi-circle")]
-public class FrontCommand
+[Verb("box", HelpText = "beacon stats of hotspots in box area")]
+public class BoxCommand
 {
     [Value(0, MetaName = "hotspot name", Required = true, HelpText = "hotspot animal name")]
     public string name { get; set; }

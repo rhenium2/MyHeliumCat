@@ -1,4 +1,4 @@
-namespace HeliumInsighter.Services;
+namespace HBeacons.Services;
 
 public class Response
 {

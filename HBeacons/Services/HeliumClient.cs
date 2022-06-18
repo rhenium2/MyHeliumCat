@@ -2,7 +2,7 @@ using System.Net;
 using System.Text.Json.Nodes;
 using Polly;
 
-namespace HeliumInsighter.Services;
+namespace HBeacons.Services;
 
 public static class HeliumClient
 {

@@ -1,7 +1,7 @@
-using HeliumInsighter.Responses;
-using HeliumInsighter.Services;
+using HBeacons.Responses;
+using HBeacons.Services;
 
-namespace HeliumInsighter.Commands;
+namespace HBeacons.Commands;
 
 public static class Commands
 {

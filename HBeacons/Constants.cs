@@ -1,6 +1,6 @@
-using HeliumInsighter.Responses;
+using HBeacons.Responses;
 
-namespace HeliumInsighter;
+namespace HBeacons;
 
 public static class Constants
 {

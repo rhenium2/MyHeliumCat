@@ -1,6 +1,6 @@
-using HeliumInsighter.Responses.Transactions;
+using HBeacons.Responses.Transactions;
 
-namespace HeliumInsighter.Responses;
+namespace HBeacons.Responses;
 
 public class Hotspot
 {
