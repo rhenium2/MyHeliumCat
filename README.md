@@ -3,6 +3,8 @@
 I decided to make a .NET Cli application to show the beacons in the past n minutes around my hotspot. 
 This was really helpful to see whether I couldn't receive a signal (aka antenna issues) or there simply isn't any beacon to witness.
 
+It also calculates the direction and distance of each hotspot, so that it's easier to figure out which side is working better.
+
 There are 3 ways to search:
 * front: beacons in the semi-circle(270° to 90°) from the position of the hotspot
 * radius: beacons in the 360° radius around the hotspot
