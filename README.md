@@ -13,7 +13,7 @@ There are 3 ways to search:
 
 An example run is:
 ```
-dotnet HeliumInsighter.dll front <hotspot animal name> --past 10 --radius 5
+dotnet HBeacons.dll front <hotspot animal name> --past 10 --radius 5
 ```
 An example output is:
 ```
