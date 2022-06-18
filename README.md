@@ -1,19 +1,24 @@
-# HBeacons - Helium hotspot beacon stats
+# HeliumCat - Helium hotspot utility
 
-I decided to make a .NET Cli application to show the beacons in the past n minutes around my hotspot. 
-This was really helpful to see whether I couldn't receive a signal (aka antenna issues) or there simply isn't any beacon to witness.
+I decided to make a .NET Cli application to help me understand helium hotspots more.
+It requires [.Net 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) to be installed.
 
-It also calculates the direction and distance of each hotspot, so that it's easier to figure out which side is working better.
-
-There are 3 ways to search:
+Current functions:
 * front: beacons in the semi-circle(270° to 90°) from the position of the hotspot
 * radius: beacons in the 360° radius around the hotspot
 * box: beacons in the witnessed box around the hotspot
+* direction: calculates the direction between two hotspots
 
+## Usage
 
-An example run is:
+### direction
 ```
-dotnet HBeacons.dll front <hotspot animal name> --past 10 --radius 5
+dotnet HeliumCat.dll direction <hotspot1 animal name> <hotspot2 animal name>
+```
+
+### front
+```
+dotnet HeliumCat.dll front <hotspot animal name> --past 10 --radius 5
 ```
 An example output is:
 ```

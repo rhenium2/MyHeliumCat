@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HBeacons", "HBeacons\HBeacons.csproj", "{1410624B-2CAD-430E-AD60-A5591EFAC2E5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeliumCat", "HeliumCat\HeliumCat.csproj", "{1410624B-2CAD-430E-AD60-A5591EFAC2E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

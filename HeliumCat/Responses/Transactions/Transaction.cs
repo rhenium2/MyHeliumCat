@@ -1,4 +1,4 @@
-namespace HBeacons.Responses.Transactions;
+namespace HeliumCat.Responses.Transactions;
 
 public class Transaction
 {

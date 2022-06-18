@@ -1,6 +1,6 @@
 using CommandLine;
 
-namespace HBeacons.Commands;
+namespace HeliumCat.Commands;
 
 [Verb("radius", HelpText = "beacon stats of hotspots in a radius")]
 public class RadiusCommand

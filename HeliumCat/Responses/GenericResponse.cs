@@ -1,4 +1,4 @@
-namespace HBeacons.Responses;
+namespace HeliumCat.Responses;
 
 public class GenericResponse<T>
 {

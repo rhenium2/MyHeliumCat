@@ -1,7 +1,7 @@
-using HBeacons.Responses;
-using HBeacons.Services;
+using HeliumCat.Responses;
+using HeliumCat.Services;
 
-namespace HBeacons.Commands;
+namespace HeliumCat.Commands;
 
 public static class Commands
 {
@@ -62,6 +62,18 @@ public static class Commands
         Console.WriteLine($"There are {hotspots.Count} hotspots in the {options.radius}km radius");
 
         await BeaconStats2(hotspots.ToArray(), myHotspot, minDateTime);
+    }
+
+    public static async Task Direction(DirectionCommand options)
+    {
+        var name1 = options.name.Replace(' ', '-').ToLower();
+        var name2 = options.name2.Replace(' ', '-').ToLower();
+
+        Console.WriteLine($"direction between {options.name} and {options.name2}");
+        var hotspot1 = await HotspotService.GetHotspotByName(name1);
+        var hotspot2 = await HotspotService.GetHotspotByName(name2);
+
+        Console.WriteLine($"- {hotspot2.ToString()} {Extensions.GetDirectionString(hotspot1, hotspot2)}");
     }
 
     private static async Task BeaconStats(Hotspot[] hotspots, Hotspot myHotspot, DateTime minTime)
@@ -150,11 +162,7 @@ public static class Commands
                 continue;
             }
 
-            var bearing = Extensions.DegreeBearing(myHotspot.Lat, myHotspot.Lng, hotspot.Lat, hotspot.Lng);
-            var bearingDirection = Extensions.ToDirection(bearing);
-            var distance = Extensions.CalculateDistance(myHotspot, hotspot);
-            Console.Write($"- {hotspot.ToString()} ");
-            Console.Write($"({distance.ToString("F1")}m/{bearingDirection}/{bearing.ToString("0")}°) ... ");
+            Console.Write($"- {hotspot.ToString()} {Extensions.GetDirectionString(myHotspot, hotspot)} ... ");
 
             var beacons = challenges.Where(c => c.Path.First().Challengee.Equals(hotspot.Address)).ToList();
             if (!beacons.Any())
@@ -184,5 +192,10 @@ public static class Commands
             args.Cancel = true;
             _cancelKeyPressed = true;
         };
+    }
+
+    private static string ToCorrectName(string name)
+    {
+        return name.Trim().Replace(' ', '-').ToLower();
     }
 }

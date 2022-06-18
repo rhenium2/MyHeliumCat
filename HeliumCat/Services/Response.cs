@@ -1,4 +1,4 @@
-namespace HBeacons.Services;
+namespace HeliumCat.Services;
 
 public class Response
 {

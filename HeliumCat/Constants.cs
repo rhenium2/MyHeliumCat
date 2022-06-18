@@ -1,6 +1,6 @@
-using HBeacons.Responses;
+using HeliumCat.Responses;
 
-namespace HBeacons;
+namespace HeliumCat;
 
 public static class Constants
 {

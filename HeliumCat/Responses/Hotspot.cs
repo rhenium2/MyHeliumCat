@@ -1,6 +1,6 @@
-using HBeacons.Responses.Transactions;
+using HeliumCat.Responses.Transactions;
 
-namespace HBeacons.Responses;
+namespace HeliumCat.Responses;
 
 public class Hotspot
 {

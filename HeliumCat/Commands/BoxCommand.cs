@@ -1,6 +1,6 @@
 using CommandLine;
 
-namespace HBeacons.Commands;
+namespace HeliumCat.Commands;
 
 [Verb("box", HelpText = "beacon stats of hotspots in box area")]
 public class BoxCommand

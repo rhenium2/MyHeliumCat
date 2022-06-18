@@ -1,9 +1,9 @@
 using GeoCoordinatePortable;
-using HBeacons.Responses;
+using HeliumCat.Responses;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace HBeacons;
+namespace HeliumCat;
 
 public static class Extensions
 {
@@ -38,23 +38,14 @@ public static class Extensions
         return g1.GetDistanceTo(g2);
     }
 
-    // public static double Bearing(GeoCoordinate pt1, GeoCoordinate pt2)
-    // {
-    //     double x = Math.Cos(DegreesToRadians(pt1.Latitude)) * Math.Sin(DegreesToRadians(pt2.Latitude)) -
-    //                Math.Sin(DegreesToRadians(pt1.Latitude)) * Math.Cos(DegreesToRadians(pt2.Latitude)) *
-    //                Math.Cos(DegreesToRadians(pt2.Longitude - pt1.Longitude));
-    //     double y = Math.Sin(DegreesToRadians(pt2.Longitude - pt1.Longitude)) * Math.Cos(DegreesToRadians(pt2.Latitude));
-    //
-    //     // Math.Atan2 can return negative value, 0 <= output value < 2*PI expected 
-    //     return (Math.Atan2(y, x) + Math.PI * 2) % (Math.PI * 2);
-    // }
-    //
-    // public static double DegreesToRadians(double angle)
-    // {
-    //     return angle * Math.PI / 180.0d;
-    // }
-
-
+    public static string GetDirectionString(Hotspot first, Hotspot second)
+    {
+        var bearing = Extensions.DegreeBearing(first.Lat, first.Lng, second.Lat, second.Lng);
+        var bearingDirection = Extensions.ToDirection(bearing);
+        var distance = Extensions.CalculateDistance(first, second);
+        return $"({distance.ToString("F1")}m/{bearingDirection}/{bearing.ToString("0")}°)";
+    }
+    
     public static double DegreeBearing(
         double lat1, double lon1,
         double lat2, double lon2)

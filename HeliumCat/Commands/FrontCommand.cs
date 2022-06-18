@@ -1,6 +1,6 @@
 using CommandLine;
 
-namespace HBeacons.Commands;
+namespace HeliumCat.Commands;
 
 [Verb("front", HelpText = "beacon stats of hotspots in front semi-circle")]
 public class FrontCommand
