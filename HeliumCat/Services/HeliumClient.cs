@@ -6,13 +6,13 @@ namespace HeliumCat.Services;
 
 public static class HeliumClient
 {
-    private static readonly HttpClient httpClient;
+    private static readonly HttpClient HttpClient;
     private static string baseUri = "https://api.helium.io";
 
     static HeliumClient()
     {
-        httpClient = new HttpClient();
-        httpClient.DefaultRequestHeaders.Add("User-Agent", "Insight Client");
+        HttpClient = new HttpClient();
+        HttpClient.DefaultRequestHeaders.Add("User-Agent", "HeliumCat");
     }
 
     private static async Task<HttpResponseMessage> PollyGet(Func<Task<HttpResponseMessage>> func)
@@ -45,7 +45,7 @@ public static class HeliumClient
             uri += uri.Contains('?') ? $"&cursor={cursor}" : $"?cursor={cursor}";
         }
 
-        var responseMessage = await PollyGet(() => httpClient.GetAsync(uri));
+        var responseMessage = await PollyGet(() => HttpClient.GetAsync(uri));
         responseMessage.EnsureSuccessStatusCode();
         var content = await responseMessage.Content.ReadAsStringAsync();
 
