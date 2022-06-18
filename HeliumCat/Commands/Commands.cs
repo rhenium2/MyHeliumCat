@@ -5,16 +5,16 @@ namespace HeliumCat.Commands;
 
 public static class Commands
 {
-    static readonly int MaxHotspot = 400;
     private static bool _cancelKeyPressed;
 
-    public static async Task FrontSemiCircleBeaconStats(FrontCommand options)
+    public static async Task FrontBeaconStats(FrontCommand options)
     {
         Console.WriteLine($"front semi-circle beacon stats for the past {options.past} minutes ...");
 
+        var hotspotName = EnsureCorrectName(options.name);
         var minDateTime = DateTime.UtcNow.AddMinutes(-options.past);
 
-        var myHotspot = await HotspotService.GetHotspotByName(options.name);
+        var myHotspot = await HotspotService.GetHotspotByName(hotspotName);
         var hotspots = await HotspotService.GetHotspotsByRadius(myHotspot.Lat, myHotspot.Lng, options.radius);
         var frontHotspots = hotspots.Where(hotspot =>
         {
@@ -31,9 +31,10 @@ public static class Commands
     {
         Console.WriteLine($"box beacon stats for the past {options.past} minutes ...");
 
+        var hotspotName = EnsureCorrectName(options.name);
         var minDateTime = DateTime.UtcNow.AddMinutes(-options.past);
 
-        var myHotspot = await HotspotService.GetHotspotByName(options.name);
+        var myHotspot = await HotspotService.GetHotspotByName(hotspotName);
         var challenges = await HotspotService.GetWitnessed(myHotspot.Address);
 
         // calculating witnessed box
@@ -55,9 +56,10 @@ public static class Commands
     {
         Console.WriteLine($"radius beacon stats for the past {options.past} minutes ...");
 
+        var hotspotName = EnsureCorrectName(options.name);
         var minDateTime = DateTime.UtcNow.AddMinutes(-options.past);
 
-        var myHotspot = await HotspotService.GetHotspotByName(options.name);
+        var myHotspot = await HotspotService.GetHotspotByName(hotspotName);
         var hotspots = await HotspotService.GetHotspotsByRadius(myHotspot.Lat, myHotspot.Lng, options.radius);
         Console.WriteLine($"There are {hotspots.Count} hotspots in the {options.radius}km radius");
 
@@ -66,12 +68,12 @@ public static class Commands
 
     public static async Task Direction(DirectionCommand options)
     {
-        var name1 = options.name.Replace(' ', '-').ToLower();
-        var name2 = options.name2.Replace(' ', '-').ToLower();
+        var hotspotName1 = EnsureCorrectName(options.hotspotName);
+        var hotspotName2 = EnsureCorrectName(options.hotspotName2);
 
-        Console.WriteLine($"direction between {options.name} and {options.name2}");
-        var hotspot1 = await HotspotService.GetHotspotByName(name1);
-        var hotspot2 = await HotspotService.GetHotspotByName(name2);
+        Console.WriteLine($"direction between {hotspotName1} and {hotspotName2}");
+        var hotspot1 = await HotspotService.GetHotspotByName(hotspotName1);
+        var hotspot2 = await HotspotService.GetHotspotByName(hotspotName2);
 
         Console.WriteLine($"- {hotspot2.ToString()} {Extensions.GetDirectionString(hotspot1, hotspot2)}");
     }
@@ -86,7 +88,7 @@ public static class Commands
         var myWitnessedHashes = myWitnessed.Select(x => x.Hash).ToList();
         Console.WriteLine($"I witnessed {myWitnessedHashes.Count} beacons since {minTime.ToString("R")}");
 
-        var workingCount = Math.Min(MaxHotspot, hotspots.Length);
+        var workingCount = Math.Min(20, hotspots.Length);
         Console.WriteLine($"let's check {workingCount} of my surrounding hotspots' beacons");
 
         AttachCtrlC();
@@ -194,7 +196,7 @@ public static class Commands
         };
     }
 
-    private static string ToCorrectName(string name)
+    private static string EnsureCorrectName(string name)
     {
         return name.Trim().Replace(' ', '-').ToLower();
     }

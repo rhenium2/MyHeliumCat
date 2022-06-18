@@ -6,8 +6,8 @@ namespace HeliumCat.Commands;
 public class DirectionCommand
 {
     [Value(0, MetaName = "first hotspot name", Required = true, HelpText = "first hotspot animal name")]
-    public string name { get; set; }
+    public string hotspotName { get; set; }
 
     [Value(1, MetaName = "second hotspot name", Required = true, HelpText = "second hotspot animal name")]
-    public string name2 { get; set; }
+    public string hotspotName2 { get; set; }
 }
