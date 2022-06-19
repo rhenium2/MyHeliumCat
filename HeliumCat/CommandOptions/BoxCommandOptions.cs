@@ -1,9 +1,9 @@
 using CommandLine;
 
-namespace HeliumCat.Commands;
+namespace HeliumCat.CommandOptions;
 
 [Verb("box", HelpText = "beacon stats of hotspots in box area")]
-public class BoxCommand
+public class BoxCommandOptions
 {
     [Value(0, MetaName = "hotspot name", Required = true, HelpText = "hotspot animal name")]
     public string name { get; set; }

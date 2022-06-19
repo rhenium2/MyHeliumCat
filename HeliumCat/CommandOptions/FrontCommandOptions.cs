@@ -1,16 +1,21 @@
 using CommandLine;
 
-namespace HeliumCat.Commands;
+namespace HeliumCat.CommandOptions;
 
-[Verb("radius", HelpText = "beacon stats of hotspots in a radius")]
-public class RadiusCommand
+[Verb("front", HelpText = "beacon stats of hotspots in front semi-circle")]
+public class FrontCommandOptions
 {
     [Value(0, MetaName = "hotspot name", Required = true, HelpText = "hotspot animal name")]
     public string name { get; set; }
 
     [Option("past", Default = 1, HelpText = "past n minutes to report")]
-    public int past { get; set; }
+    public int pastMinutes { get; set; }
 
     [Option("radius", Default = 1, HelpText = "radius n km to report")]
     public int radius { get; set; }
+
+    public override string ToString()
+    {
+        return $"{name}, past {pastMinutes} minutes, {radius}km";
+    }
 }

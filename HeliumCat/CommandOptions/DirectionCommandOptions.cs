@@ -1,9 +1,9 @@
 using CommandLine;
 
-namespace HeliumCat.Commands;
+namespace HeliumCat.CommandOptions;
 
 [Verb("direction", HelpText = "calculates the direction between two hotspots")]
-public class DirectionCommand
+public class DirectionCommandOptions
 {
     [Value(0, MetaName = "first hotspot name", Required = true, HelpText = "first hotspot animal name")]
     public string hotspotName { get; set; }

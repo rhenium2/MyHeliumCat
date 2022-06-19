@@ -1,3 +1,4 @@
+using HeliumCat.CommandOptions;
 using HeliumCat.Responses;
 using HeliumCat.Services;
 
@@ -7,27 +8,28 @@ public static class Commands
 {
     private static bool _cancelKeyPressed;
 
-    public static async Task FrontBeaconStats(FrontCommand options)
+    public static async Task FrontBeaconStats(FrontCommandOptions options)
     {
-        Console.WriteLine($"front semi-circle beacon stats for the past {options.past} minutes ...");
+        Console.WriteLine($"front semi-circle beacon stats ({options.ToString()})");
 
         var hotspotName = EnsureCorrectName(options.name);
-        var minDateTime = DateTime.UtcNow.AddMinutes(-options.past);
+        var minDateTime = DateTime.UtcNow.AddMinutes(-options.pastMinutes);
 
         var myHotspot = await HotspotService.GetHotspotByName(hotspotName);
+
+        Console.Write("Fetching hotspots in front ... ");
         var hotspots = await HotspotService.GetHotspotsByRadius(myHotspot.Lat, myHotspot.Lng, options.radius);
         var frontHotspots = hotspots.Where(hotspot =>
         {
             var bearing = Extensions.DegreeBearing(myHotspot.Lat, myHotspot.Lng, hotspot.Lat, hotspot.Lng);
             return (bearing > 0 && bearing <= 90) || (bearing >= 270 && bearing < 360);
         }).ToArray();
-        Console.WriteLine(
-            $"There are {frontHotspots.Length} hotspots in front of me, in {options.radius}km semi-circle radius");
+        Console.WriteLine($"{frontHotspots.Length}");
 
         await BeaconStats2(frontHotspots, myHotspot, minDateTime);
     }
 
-    public static async Task BoxBeaconStats(BoxCommand options)
+    public static async Task BoxBeaconStats(BoxCommandOptions options)
     {
         Console.WriteLine($"box beacon stats for the past {options.past} minutes ...");
 
@@ -52,21 +54,22 @@ public static class Commands
         await BeaconStats2(hotspots.ToArray(), myHotspot, minDateTime);
     }
 
-    public static async Task RadiusBeaconStats(RadiusCommand options)
+    public static async Task RadiusBeaconStats(RadiusCommandOptions options)
     {
-        Console.WriteLine($"radius beacon stats for the past {options.past} minutes ...");
+        Console.WriteLine($"radius beacon stats ({options.ToString()})");
 
         var hotspotName = EnsureCorrectName(options.name);
-        var minDateTime = DateTime.UtcNow.AddMinutes(-options.past);
+        var minDateTime = DateTime.UtcNow.AddMinutes(-options.pastMinutes);
 
+        Console.Write("Fetching hotspots in the radius ... ");
         var myHotspot = await HotspotService.GetHotspotByName(hotspotName);
         var hotspots = await HotspotService.GetHotspotsByRadius(myHotspot.Lat, myHotspot.Lng, options.radius);
-        Console.WriteLine($"There are {hotspots.Count} hotspots in the {options.radius}km radius");
+        Console.WriteLine($"{hotspots.Count()}");
 
         await BeaconStats2(hotspots.ToArray(), myHotspot, minDateTime);
     }
 
-    public static async Task Direction(DirectionCommand options)
+    public static async Task Direction(DirectionCommandOptions options)
     {
         var hotspotName1 = EnsureCorrectName(options.hotspotName);
         var hotspotName2 = EnsureCorrectName(options.hotspotName2);
@@ -140,7 +143,11 @@ public static class Commands
 
     private static async Task BeaconStats2(Hotspot[] hotspots, Hotspot myHotspot, DateTime minTime)
     {
+        Console.Write("fetching all beacons in the world ... ");
         var challenges = await HotspotService.GetChallenges(minTime);
+        Console.WriteLine($"{challenges.Count}");
+
+        Console.Write("beacons from hotspots ... ");
         var myWitnessed =
             challenges.Where(c => c.Path.Any()
                                   && c.Path.First().Witnesses
@@ -149,8 +156,7 @@ public static class Commands
 
         var beaconedHotspots =
             hotspots.Where(h => challenges.Select(c => c.Path.First().Challengee).Contains(h.Address));
-
-        Console.WriteLine($"There has been {challenges.Count} beacons in the world");
+        Console.WriteLine($"{beaconedHotspots.Count()}");
 
 
         var totalCount = 0;
