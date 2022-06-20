@@ -40,12 +40,17 @@ public static class Extensions
         return g1.GetDistanceTo(g2);
     }
 
+    public static string ToDistanceText(double distance)
+    {
+        return $"{distance:F1}m";
+    }
+
     public static string GetDirectionString(Hotspot first, Hotspot second)
     {
         var bearing = Extensions.DegreeBearing(first.Lat, first.Lng, second.Lat, second.Lng);
         var bearingDirection = Extensions.ToDirection(bearing);
         var distance = Extensions.CalculateDistance(first, second);
-        return $"({distance.ToString("F1")}m/{bearingDirection}/{bearing.ToString("0")}°)";
+        return $"({ToDistanceText(distance)}/{bearingDirection}/{bearing.ToString("0")}°)";
     }
 
     public static double DegreeBearing(
@@ -90,6 +95,7 @@ public static class Extensions
 
         throw new ArgumentException(d.ToString());
     }
+
 
     public static async Task CheckForNewVersion()
     {

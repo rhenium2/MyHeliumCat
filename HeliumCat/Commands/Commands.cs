@@ -8,17 +8,17 @@ public static class Commands
 {
     private static bool _cancelKeyPressed;
 
-    public static async Task FrontBeaconStats(FrontCommandOptions options)
+    public static async Task FrontBeaconStats(FrontOptions options)
     {
         Console.WriteLine($"front semi-circle beacon stats ({options.ToString()})");
 
-        var hotspotName = EnsureCorrectName(options.name);
-        var minDateTime = DateTime.UtcNow.AddMinutes(-options.pastMinutes);
+        var hotspotName = EnsureCorrectName(options.Name);
+        var minDateTime = DateTime.UtcNow.AddMinutes(-options.PastMinutes);
 
         var myHotspot = await HotspotService.GetHotspotByName(hotspotName);
 
         Console.Write("Fetching hotspots in front ... ");
-        var hotspots = await HotspotService.GetHotspotsByRadius(myHotspot.Lat, myHotspot.Lng, options.radius);
+        var hotspots = await HotspotService.GetHotspotsByRadius(myHotspot.Lat, myHotspot.Lng, options.Radius);
         var frontHotspots = hotspots.Where(hotspot =>
         {
             var bearing = Extensions.DegreeBearing(myHotspot.Lat, myHotspot.Lng, hotspot.Lat, hotspot.Lng);
@@ -26,15 +26,15 @@ public static class Commands
         }).ToArray();
         Console.WriteLine($"{frontHotspots.Length}");
 
-        await BeaconStats2(frontHotspots, myHotspot, minDateTime);
+        await BeaconStats(frontHotspots, myHotspot, minDateTime);
     }
 
-    public static async Task BoxBeaconStats(BoxCommandOptions options)
+    public static async Task BoxBeaconStats(BoxOptions options)
     {
-        Console.WriteLine($"box beacon stats for the past {options.past} minutes ...");
+        Console.WriteLine($"box beacon stats for the past {options.Past} minutes ...");
 
-        var hotspotName = EnsureCorrectName(options.name);
-        var minDateTime = DateTime.UtcNow.AddMinutes(-options.past);
+        var hotspotName = EnsureCorrectName(options.Name);
+        var minDateTime = DateTime.UtcNow.AddMinutes(-options.Past);
 
         var myHotspot = await HotspotService.GetHotspotByName(hotspotName);
         var challenges = await HotspotService.GetWitnessed(myHotspot.Address);
@@ -51,28 +51,28 @@ public static class Commands
         Console.WriteLine(
             $"There are {hotspots.Count} hotspots in my witnessed box. SW({swLat}, {swLon}) and NE({neLat}, {neLon})");
 
-        await BeaconStats2(hotspots.ToArray(), myHotspot, minDateTime);
+        await BeaconStats(hotspots.ToArray(), myHotspot, minDateTime);
     }
 
-    public static async Task RadiusBeaconStats(RadiusCommandOptions options)
+    public static async Task RadiusBeaconStats(RadiusOptions options)
     {
         Console.WriteLine($"radius beacon stats ({options.ToString()})");
 
-        var hotspotName = EnsureCorrectName(options.name);
-        var minDateTime = DateTime.UtcNow.AddMinutes(-options.pastMinutes);
+        var hotspotName = EnsureCorrectName(options.Name);
+        var minDateTime = DateTime.UtcNow.AddMinutes(-options.PastMinutes);
 
         Console.Write("Fetching hotspots in the radius ... ");
         var myHotspot = await HotspotService.GetHotspotByName(hotspotName);
-        var hotspots = await HotspotService.GetHotspotsByRadius(myHotspot.Lat, myHotspot.Lng, options.radius);
+        var hotspots = await HotspotService.GetHotspotsByRadius(myHotspot.Lat, myHotspot.Lng, options.Radius);
         Console.WriteLine($"{hotspots.Count()}");
 
-        await BeaconStats2(hotspots.ToArray(), myHotspot, minDateTime);
+        await BeaconStats(hotspots.ToArray(), myHotspot, minDateTime);
     }
 
-    public static async Task Direction(DirectionCommandOptions options)
+    public static async Task Direction(DirectionOptions options)
     {
-        var hotspotName1 = EnsureCorrectName(options.hotspotName);
-        var hotspotName2 = EnsureCorrectName(options.hotspotName2);
+        var hotspotName1 = EnsureCorrectName(options.HotspotName);
+        var hotspotName2 = EnsureCorrectName(options.HotspotName2);
 
         Console.WriteLine($"direction between {hotspotName1} and {hotspotName2}");
         var hotspot1 = await HotspotService.GetHotspotByName(hotspotName1);
@@ -81,67 +81,27 @@ public static class Commands
         Console.WriteLine($"- {hotspot2.ToString()} {Extensions.GetDirectionString(hotspot1, hotspot2)}");
     }
 
-    private static async Task BeaconStats(Hotspot[] hotspots, Hotspot myHotspot, DateTime minTime)
+    public static async Task Distance(DistanceOptions options)
     {
-        var challenges = await HotspotService.GetChallenges(myHotspot.Address, minTime);
-        var myWitnessed =
-            challenges.Where(c => c.Path.Any()
-                                  && c.Path.First().Witnesses
-                                      .Any(x => x.IsValid && x.Gateway.Equals(myHotspot.Address)));
-        var myWitnessedHashes = myWitnessed.Select(x => x.Hash).ToList();
-        Console.WriteLine($"I witnessed {myWitnessedHashes.Count} beacons since {minTime.ToString("R")}");
+        var hotspotName = EnsureCorrectName(options.Name);
+        Console.WriteLine($"distance stats ({options.ToString()}) in the last 5 days");
 
-        var workingCount = Math.Min(20, hotspots.Length);
-        Console.WriteLine($"let's check {workingCount} of my surrounding hotspots' beacons");
+        var myHotspot = await HotspotService.GetHotspotByName(hotspotName);
+        Console.Write("Fetching witnessed ... ");
+        var witnessed = await HotspotService.GetWitnessed(myHotspot.Address);
+        Console.WriteLine($"{witnessed.Count}");
 
-        AttachCtrlC();
+        var witnessedDistances = witnessed.Select(w => Extensions.CalculateDistance(myHotspot, w)).ToList();
 
-        var totalCount = 0;
-        var totalHitCount = 0;
-        var totalMissedCount = 0;
-        for (var i = 0; i < workingCount; i++)
-        {
-            if (_cancelKeyPressed)
-            {
-                Console.WriteLine("Ctrl + C");
-                break;
-            }
-
-
-            var hotspot = hotspots[i];
-            if (hotspot.Address.Equals(myHotspot.Address))
-            {
-                continue;
-            }
-
-            var bearing = Extensions.DegreeBearing(myHotspot.Lat, myHotspot.Lng, hotspot.Lat, hotspot.Lng);
-            var bearingDirection = Extensions.ToDirection(bearing);
-            var distance = Extensions.CalculateDistance(myHotspot, hotspot);
-            Console.Write($"{i + 1}. {hotspot.ToString()}");
-            Console.Write($"({distance.ToString("F1")}m/{bearingDirection}/{bearing.ToString("0")}°) ... ");
-
-            var beacons = await HotspotService.GetBeaconTransactions(hotspot.Address, minTime);
-            if (!beacons.Any())
-            {
-                Console.WriteLine("no beacon");
-                continue;
-            }
-
-            var witnessedCount = beacons.Count(x => myWitnessedHashes.Contains(x.Hash));
-            var missedCount = beacons.Count - witnessedCount;
-            Console.WriteLine($"beacons: {beacons.Count}, witnessed: {witnessedCount}, missed: {missedCount}");
-
-            totalHitCount += witnessedCount;
-            totalMissedCount += missedCount;
-            totalCount += beacons.Count;
-        }
-
+        var min = Extensions.ToDistanceText(witnessedDistances.Min());
+        var average = Extensions.ToDistanceText(witnessedDistances.Average());
+        var max = Extensions.ToDistanceText(witnessedDistances.Max());
         Console.WriteLine("");
-        Console.WriteLine("--- beacon statistics ---");
-        Console.WriteLine($"total: {totalCount} , witnessed: {totalHitCount} , missed: {totalMissedCount}");
+        Console.WriteLine("--- distance statistics ---");
+        Console.WriteLine($"total: {witnessedDistances.Count} min: {min} avg: {average} max: {max}");
     }
 
-    private static async Task BeaconStats2(Hotspot[] hotspots, Hotspot myHotspot, DateTime minTime)
+    private static async Task BeaconStats(Hotspot[] hotspots, Hotspot myHotspot, DateTime minTime)
     {
         Console.Write("fetching all beacons in the world ... ");
         var challenges = await HotspotService.GetChallenges(minTime);

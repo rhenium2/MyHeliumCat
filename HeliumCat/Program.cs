@@ -6,7 +6,7 @@ using HeliumCat.Commands;
 
 var parserResult =
     Parser.Default
-        .ParseArguments<FrontCommandOptions, RadiusCommandOptions, BoxCommandOptions, DirectionCommandOptions>(args);
+        .ParseArguments<FrontOptions, RadiusOptions, BoxOptions, DirectionOptions, DistanceOptions>(args);
 if (parserResult.Errors.Any())
 {
     return;
@@ -15,10 +15,11 @@ if (parserResult.Errors.Any())
 Extensions.WriteHeader();
 await Extensions.CheckForNewVersion();
 
-await parserResult.WithParsedAsync<FrontCommandOptions>(async options =>
+await parserResult.WithParsedAsync<FrontOptions>(async options =>
     await Commands.FrontBeaconStats(options));
-await parserResult.WithParsedAsync<RadiusCommandOptions>(async options => await Commands.RadiusBeaconStats(options));
-await parserResult.WithParsedAsync<BoxCommandOptions>(async options => await Commands.BoxBeaconStats(options));
-await parserResult.WithParsedAsync<DirectionCommandOptions>(async options => await Commands.Direction(options));
+await parserResult.WithParsedAsync<RadiusOptions>(async options => await Commands.RadiusBeaconStats(options));
+await parserResult.WithParsedAsync<BoxOptions>(async options => await Commands.BoxBeaconStats(options));
+await parserResult.WithParsedAsync<DirectionOptions>(async options => await Commands.Direction(options));
+await parserResult.WithParsedAsync<DistanceOptions>(async options => await Commands.Distance(options));
 
 Console.WriteLine("Done");
