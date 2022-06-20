@@ -66,6 +66,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: ${{env.releaseVersion}}
           files: |
             HeliumCat/bin/Release/net6.0/osx-x64/publish/HeliumCat
             HeliumCat/bin/Release/net6.0/osx-arm64/publish/HeliumCat
