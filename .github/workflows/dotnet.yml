@@ -34,6 +34,7 @@ jobs:
       run: dotnet test --no-build --verbosity normal
       
   publish:
+    needs: build
     if: (github.ref == 'refs/heads/main' && github.event.inputs.release == 'true')
     runs-on: macos-latest
     env:
