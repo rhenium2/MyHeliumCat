@@ -55,7 +55,7 @@ jobs:
       - name: Publish
         run: dotnet publish -c Release -p:Version=${{env.releaseVersion}}
       - name: Zip
-        run: (cd HeliumCat/bin/Release/net6.0/publish ; zip -r HeliumCat_v${{env.releaseVersion}}.zip *)
+        run: (cd HeliumCat/bin/Release/net6.0/publish ; rm HeliumCat ; zip -r HeliumCat_v${{env.releaseVersion}}.zip *)
       # create a release
       - name: Release
         uses: softprops/action-gh-release@v1
