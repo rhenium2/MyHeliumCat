@@ -10,7 +10,4 @@ public class BoxOptions
 
     [Option("past", Default = 1, HelpText = "past n minutes to report")]
     public int Past { get; set; }
-
-    [Option("radius", Default = 1, HelpText = "radius n km to report")]
-    public int Radius { get; set; }
 }

@@ -13,10 +13,13 @@ Current functions:
 ## Usage
 
 ### front
+beacon stats of hotspots in front semi-circle, in the past _x_ minutes and _y_ kilometers radius 
 ```
 dotnet HeliumCat.dll front <hotspot animal name> --past 10 --radius 5
 ```
-An example output is:
+<details>
+    <summary>example output</summary>
+
 ```
 Hello, World!
 Staring Front Semi-Circle Beacon Stats for the past 10 minutes ...
@@ -29,13 +32,28 @@ There has been 1765 beacons in the world
 total: 2 , witnessed: 1 , missed: 1
 Done
 ```
+</details>
+
+### radius
+beacon stats of hotspots in a radius
+```
+dotnet HeliumCat.dll radius <hotspot animal name> --past 10 --radius 5
+```
+
+### box
+beacon stats of hotspots in box area based on last 5 days witnessed locations
+```
+dotnet HeliumCat.dll box <hotspot animal name> --past 10
+```
 
 ### direction
+calculates the direction between two hotspots
 ```
 dotnet HeliumCat.dll direction <hotspot1 animal name> <hotspot2 animal name>
 ```
 
 ### distance
+distance stats of hotspot witnessed in the last 5 days
 ```
 dotnet HeliumCat.dll distance <hotspot1 animal name>
 ```
