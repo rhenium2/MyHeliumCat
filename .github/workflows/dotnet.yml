@@ -51,14 +51,15 @@ jobs:
         run: dotnet restore
       - name: Build
         run: dotnet build --no-restore
-      # publish portable framework-dependent
+      # publish
       - name: Publish
         run: dotnet publish -c Release -p:Version=${{env.releaseVersion}}
-    
+      - name: Zip
+        run: (cd HeliumCat/bin/Release/net6.0/publish ; zip -r HeliumCat_v${{env.releaseVersion}}.zip *)
       # create a release
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{env.releaseVersion}}
           files: |
-            HeliumCat/bin/Release/net6.0/publish/HeliumCat.dll
+            HeliumCat/bin/Release/net6.0/publish/HeliumCat_v${{env.releaseVersion}}.zip
