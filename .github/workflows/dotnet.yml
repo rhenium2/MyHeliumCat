@@ -1,16 +1,25 @@
-name: .NET
+name: dotnet
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      release:
+        required: true
+        default: false
+      majorVersion:
+        required: true
+        default: "0"
+      minorVersion:
+        required: true
+        default: "1"
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
     - name: Setup .NET
@@ -23,3 +32,41 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
+      
+  publish:
+    if: (github.ref == 'refs/heads/main' && github.event.inputs.release == true)
+    runs-on: macos-latest
+    env:
+      releaseVersion: ${{ github.event.inputs.majorVersion }}.${{ github.event.inputs.minorVersion }}.${{ github.run_number }}
+    steps:
+      - name: Version
+        run: echo Releasing version $releaseVersion
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore
+      # Publish osx-x64
+      - name: Publish osx-x64
+        run: dotnet publish -r osx-x64 -c Release -p:PublishSingleFile=true -p:Version=${{env.releaseVersion}} -p:EnableCompressionInSingleFile=true
+      # Publish osx-arm64
+      - name: Publish osx-arm64
+        run: dotnet publish -r osx-arm64 -c Release -p:PublishSingleFile=true -p:Version=${{env.releaseVersion}} -p:EnableCompressionInSingleFile=true
+      # Publish win-x64
+      - name: Publish win-x64
+        run: dotnet publish -r win-x64 -c Release -p:PublishSingleFile=true -p:Version=${{env.releaseVersion}} -p:EnableCompressionInSingleFile=true
+      # Publish linux-x64
+      - name: Publish linux-x64
+        run: dotnet publish -r linux-x64 -c Release -p:PublishSingleFile=true -p:Version=${{env.releaseVersion}} -p:EnableCompressionInSingleFile=true
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            HeliumCat/bin/Release/net6.0/osx-x64/publish/HeliumCat
+            HeliumCat/bin/Release/net6.0/osx-arm64/publish/HeliumCat
+            HeliumCat/bin/Release/net6.0/win-x64/publish/HeliumCat
+            HeliumCat/bin/Release/net6.0/linux-x64/publish/HeliumCat
