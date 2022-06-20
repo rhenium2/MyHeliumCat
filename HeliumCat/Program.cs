@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using CommandLine;
+﻿using CommandLine;
+using HeliumCat;
 using HeliumCat.CommandOptions;
 using HeliumCat.Commands;
 
@@ -12,8 +12,8 @@ if (parserResult.Errors.Any())
     return;
 }
 
-var assemblyName = Assembly.GetExecutingAssembly().GetName();
-Console.WriteLine($"{assemblyName.Name} {assemblyName.Version.ToString(3)}");
+Extensions.WriteHeader();
+await Extensions.CheckForNewVersion();
 
 await parserResult.WithParsedAsync<FrontCommandOptions>(async options =>
     await Commands.FrontBeaconStats(options));

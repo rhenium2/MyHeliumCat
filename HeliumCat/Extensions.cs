@@ -1,5 +1,7 @@
+using System.Reflection;
 using GeoCoordinatePortable;
 using HeliumCat.Responses;
+using HeliumCat.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -45,7 +47,7 @@ public static class Extensions
         var distance = Extensions.CalculateDistance(first, second);
         return $"({distance.ToString("F1")}m/{bearingDirection}/{bearing.ToString("0")}°)";
     }
-    
+
     public static double DegreeBearing(
         double lat1, double lon1,
         double lat2, double lon2)
@@ -87,5 +89,24 @@ public static class Extensions
         if (d > 270 && d < 360) return "NW";
 
         throw new ArgumentException(d.ToString());
+    }
+
+    public static async Task CheckForNewVersion()
+    {
+        var version = Assembly.GetExecutingAssembly().GetName().Version;
+        var latestRelease = await GithubService.GetLatestRelease();
+        var latestReleaseVersion = new Version(latestRelease.name);
+        if (latestReleaseVersion > version)
+        {
+            var message =
+                $"New version v{latestReleaseVersion} is available. \n Download now at {latestRelease.html_url}";
+            Console.WriteLine(message);
+        }
+    }
+
+    public static void WriteHeader()
+    {
+        var assemblyName = Assembly.GetExecutingAssembly().GetName();
+        Console.WriteLine($"{assemblyName.Name} {assemblyName.Version.ToString(3)}");
     }
 }
