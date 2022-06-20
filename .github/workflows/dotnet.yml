@@ -9,7 +9,7 @@ on:
     inputs:
       release:
         required: true
-        default: false
+        default: "false"
       majorVersion:
         required: true
         default: "0"
@@ -34,7 +34,8 @@ jobs:
       run: dotnet test --no-build --verbosity normal
       
   publish:
-    if: (github.ref == 'refs/heads/main' && github.event.inputs.release == true)
+    needs: build
+    if: (github.ref == 'refs/heads/main' && github.event.inputs.release == 'true')
     runs-on: macos-latest
     env:
       releaseVersion: ${{ github.event.inputs.majorVersion }}.${{ github.event.inputs.minorVersion }}.${{ github.run_number }}
@@ -50,23 +51,15 @@ jobs:
         run: dotnet restore
       - name: Build
         run: dotnet build --no-restore
-      # Publish osx-x64
-      - name: Publish osx-x64
-        run: dotnet publish -r osx-x64 -c Release -p:PublishSingleFile=true -p:Version=${{env.releaseVersion}} -p:EnableCompressionInSingleFile=true
-      # Publish osx-arm64
-      - name: Publish osx-arm64
-        run: dotnet publish -r osx-arm64 -c Release -p:PublishSingleFile=true -p:Version=${{env.releaseVersion}} -p:EnableCompressionInSingleFile=true
-      # Publish win-x64
-      - name: Publish win-x64
-        run: dotnet publish -r win-x64 -c Release -p:PublishSingleFile=true -p:Version=${{env.releaseVersion}} -p:EnableCompressionInSingleFile=true
-      # Publish linux-x64
-      - name: Publish linux-x64
-        run: dotnet publish -r linux-x64 -c Release -p:PublishSingleFile=true -p:Version=${{env.releaseVersion}} -p:EnableCompressionInSingleFile=true
+      # publish
+      - name: Publish
+        run: dotnet publish -c Release -p:Version=${{env.releaseVersion}}
+      - name: Zip
+        run: (cd HeliumCat/bin/Release/net6.0/publish ; rm HeliumCat ; zip -r HeliumCat_v${{env.releaseVersion}}.zip *)
+      # create a release
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: ${{env.releaseVersion}}
           files: |
-            HeliumCat/bin/Release/net6.0/osx-x64/publish/HeliumCat
-            HeliumCat/bin/Release/net6.0/osx-arm64/publish/HeliumCat
-            HeliumCat/bin/Release/net6.0/win-x64/publish/HeliumCat
-            HeliumCat/bin/Release/net6.0/linux-x64/publish/HeliumCat
+            HeliumCat/bin/Release/net6.0/publish/HeliumCat_v${{env.releaseVersion}}.zip
