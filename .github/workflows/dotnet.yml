@@ -51,24 +51,14 @@ jobs:
         run: dotnet restore
       - name: Build
         run: dotnet build --no-restore
-      # Publish osx-x64
-      - name: Publish osx-x64
-        run: dotnet publish -r osx-x64 -c Release -p:PublishSingleFile=true -p:Version=${{env.releaseVersion}} -p:EnableCompressionInSingleFile=true
-      # Publish osx-arm64
-      - name: Publish osx-arm64
-        run: dotnet publish -r osx-arm64 -c Release -p:PublishSingleFile=true -p:Version=${{env.releaseVersion}} -p:EnableCompressionInSingleFile=true
-      # Publish win-x64
-      - name: Publish win-x64
-        run: dotnet publish -r win-x64 -c Release -p:PublishSingleFile=true -p:Version=${{env.releaseVersion}} -p:EnableCompressionInSingleFile=true
-      # Publish linux-x64
-      - name: Publish linux-x64
-        run: dotnet publish -r linux-x64 -c Release -p:PublishSingleFile=true -p:Version=${{env.releaseVersion}} -p:EnableCompressionInSingleFile=true
+      # publish portable framework-dependent
+      - name: Publish
+        run: dotnet publish -c Release -p:Version=${{env.releaseVersion}}
+    
+      # create a release
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{env.releaseVersion}}
           files: |
-            HeliumCat/bin/Release/net6.0/osx-x64/publish/HeliumCat
-            HeliumCat/bin/Release/net6.0/osx-arm64/publish/HeliumCat
-            HeliumCat/bin/Release/net6.0/win-x64/publish/HeliumCat.exe
-            HeliumCat/bin/Release/net6.0/linux-x64/publish/HeliumCat
+            HeliumCat/bin/Release/net6.0/publish/HeliumCat.dll
