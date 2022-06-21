@@ -28,6 +28,33 @@ public static class Extensions
         return result;
     }
 
+    public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
+    {
+        // Unix timestamp is seconds past epoch
+        DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+        dateTime = dateTime.AddSeconds(unixTimeStamp);
+        return dateTime;
+    }
+
+    public static string GetRelativeTimeString(int UtcSeconds)
+    {
+        var dateTime = UnixTimeStampToDateTime(UtcSeconds);
+        var timeSpan = DateTime.UtcNow - dateTime;
+
+        (string unit, int value) = new Dictionary<string, int>
+        {
+            { "year(s)", (int)(timeSpan.TotalDays / 365.25) }, //https://en.wikipedia.org/wiki/Year#Intercalation
+            { "month(s)", (int)(timeSpan.TotalDays / 29.53) }, //https://en.wikipedia.org/wiki/Month
+            { "day(s)", (int)timeSpan.TotalDays },
+            { "hour(s)", (int)timeSpan.TotalHours },
+            { "minute(s)", (int)timeSpan.TotalMinutes },
+            { "second(s)", (int)timeSpan.TotalSeconds },
+            { "millisecond(s)", (int)timeSpan.TotalMilliseconds }
+        }.First(kvp => kvp.Value > 0);
+
+        return $"{value} {unit} ago";
+    }
+
     public static decimal GetGain(int gain)
     {
         return (decimal)gain / 10;

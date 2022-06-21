@@ -4,18 +4,19 @@ I decided to make a .NET Cli application to help me understand helium hotspots m
 It requires [.Net 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) to be installed.
 
 Current functions:
-* front: beacons in the semi-circle(270° to 90°) from the position of the hotspot
-* radius: beacons in the 360° radius around the hotspot
-* box: beacons in the witnessed box around the hotspot
-* direction: calculates the direction between two hotspots
-* distance: distance statistics for the witnessed hotspots in the last 5 days 
+* [front](#front): beacons in the semi-circle(270° to 90°) from the position of the hotspot
+* [radius](#radius): beacons in the 360° radius around the hotspot
+* [box](#box): beacons in the witnessed box around the hotspot (the most bottom left and the most top right hotspots) in the last 5 days
+* [direction](#direction): calculates the direction between two hotspots
+* [distance](#distance): distance statistics for the witnessed hotspots in the last 5 days
+* [witnessed](#witnessed): shows witnessed stats of hotspot 
 
 ## Usage
 
 ### front
 beacon stats of hotspots in front semi-circle, in the past _x_ minutes and _y_ kilometers radius 
 ```
-dotnet HeliumCat.dll front <hotspot animal name> --past 10 --radius 5
+dotnet HeliumCat.dll front <hotspot name or address> --past 10 --radius 5
 ```
 <details>
     <summary>example output</summary>
@@ -37,23 +38,29 @@ Done
 ### radius
 beacon stats of hotspots in a radius
 ```
-dotnet HeliumCat.dll radius <hotspot animal name> --past 10 --radius 5
+dotnet HeliumCat.dll radius <hotspot name or address> --past 10 --radius 5
 ```
 
 ### box
 beacon stats of hotspots in box area based on last 5 days witnessed locations
 ```
-dotnet HeliumCat.dll box <hotspot animal name> --past 10
+dotnet HeliumCat.dll box <hotspot name or address> --past 10
 ```
 
 ### direction
 calculates the direction between two hotspots
 ```
-dotnet HeliumCat.dll direction <hotspot1 animal name> <hotspot2 animal name>
+dotnet HeliumCat.dll direction <hotspot1 name or address> <hotspot2 name or address>
 ```
 
 ### distance
 distance stats of hotspot witnessed in the last 5 days
 ```
-dotnet HeliumCat.dll distance <hotspot1 animal name>
+dotnet HeliumCat.dll distance <hotspot name or address>
+```
+
+### witnessed
+shows witnessed stats of hotspot
+```
+dotnet HeliumCat.dll witnessed <hotspot name or address> --past 10
 ```

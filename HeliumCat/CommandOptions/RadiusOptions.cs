@@ -5,8 +5,8 @@ namespace HeliumCat.CommandOptions;
 [Verb("radius", HelpText = "beacon stats of hotspots in a radius")]
 public class RadiusOptions
 {
-    [Value(0, MetaName = "hotspot name", Required = true, HelpText = "hotspot animal name")]
-    public string Name { get; set; }
+    [Value(0, MetaName = "hotspot name or address", Required = true, HelpText = "hotspot name or address")]
+    public string Identifier { get; set; }
 
     [Option("past", Default = 1, HelpText = "past n minutes to report")]
     public int PastMinutes { get; set; }
@@ -16,6 +16,6 @@ public class RadiusOptions
 
     public override string ToString()
     {
-        return $"{Name}, past {PastMinutes} minutes, {Radius}km";
+        return $"{Identifier}, past {PastMinutes} minutes, {Radius}km";
     }
 }

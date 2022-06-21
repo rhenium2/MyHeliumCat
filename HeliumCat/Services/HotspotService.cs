@@ -18,7 +18,13 @@ public static class HotspotService
     {
         var uri = $"/v1/hotspots/name/{name}";
         var data = await HeliumClient.Get(uri);
-        return Extensions.DeserializeAll<Hotspot>(data.ToArray()).First();
+        var hotspots = Extensions.DeserializeAll<Hotspot>(data.ToArray());
+        if (hotspots.Count > 1)
+        {
+            throw new Exception("There are more than one hotspot for this name. Please use hotspot address instead.");
+        }
+
+        return hotspots.First();
     }
 
     public static async Task<List<Hotspot>> GetWitnessed(string hotspotId)
@@ -78,6 +84,23 @@ public static class HotspotService
         var allData = await HeliumClient.Get(uri);
         var tt = Extensions.DeserializeAll<PocReceiptsTransaction>(allData.ToArray());
         return tt.Where(t => t.Path.First().Challengee.Equals(hotspotId)).ToList();
+    }
+
+    public static async Task<List<PocReceiptsTransaction>> GetWitnessedTransactions(string hotspotId, DateTime? minTime)
+    {
+        var uri = $"/v1/hotspots/{hotspotId}/challenges";
+        if (minTime.HasValue)
+        {
+            uri += "?min_time=" + minTime.Value.ToString("o", CultureInfo.InvariantCulture);
+        }
+
+        var allData = await HeliumClient.Get(uri);
+        var tt = Extensions.DeserializeAll<PocReceiptsTransaction>(allData.ToArray());
+        return tt.Where(c => c.Path.Any()
+                             && c.Path.First().Witnesses
+                                 .Any(x => x.IsValid && x.Gateway.Equals(hotspotId)))
+            .OrderByDescending(x => x.Time)
+            .ToList();
     }
 
     private static Transaction DeserializeTransaction(string transactionString)

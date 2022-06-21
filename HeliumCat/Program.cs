@@ -6,7 +6,8 @@ using HeliumCat.Commands;
 
 var parserResult =
     Parser.Default
-        .ParseArguments<FrontOptions, RadiusOptions, BoxOptions, DirectionOptions, DistanceOptions>(args);
+        .ParseArguments<FrontOptions, RadiusOptions, BoxOptions, DirectionOptions, DistanceOptions,
+            WitnessedOptions>(args);
 if (parserResult.Errors.Any())
 {
     return;
@@ -21,5 +22,6 @@ await parserResult.WithParsedAsync<RadiusOptions>(async options => await Command
 await parserResult.WithParsedAsync<BoxOptions>(async options => await Commands.BoxBeaconStats(options));
 await parserResult.WithParsedAsync<DirectionOptions>(async options => await Commands.Direction(options));
 await parserResult.WithParsedAsync<DistanceOptions>(async options => await Commands.Distance(options));
+await parserResult.WithParsedAsync<WitnessedOptions>(async options => await Commands.Witnessed(options));
 
 Console.WriteLine("Done");

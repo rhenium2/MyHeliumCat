@@ -12,10 +12,9 @@ public static class Commands
     {
         Console.WriteLine($"front semi-circle beacon stats ({options.ToString()})");
 
-        var hotspotName = EnsureCorrectName(options.Name);
         var minDateTime = DateTime.UtcNow.AddMinutes(-options.PastMinutes);
 
-        var myHotspot = await HotspotService.GetHotspotByName(hotspotName);
+        var myHotspot = await GetHotspotByIdentifier(options.Identifier);
 
         Console.Write("Fetching hotspots in front ... ");
         var hotspots = await HotspotService.GetHotspotsByRadius(myHotspot.Lat, myHotspot.Lng, options.Radius);
@@ -33,10 +32,9 @@ public static class Commands
     {
         Console.WriteLine($"box beacon stats for the past {options.Past} minutes ...");
 
-        var hotspotName = EnsureCorrectName(options.Name);
         var minDateTime = DateTime.UtcNow.AddMinutes(-options.Past);
 
-        var myHotspot = await HotspotService.GetHotspotByName(hotspotName);
+        var myHotspot = await GetHotspotByIdentifier(options.Identifier);
         var challenges = await HotspotService.GetWitnessed(myHotspot.Address);
 
         // calculating witnessed box
@@ -58,11 +56,11 @@ public static class Commands
     {
         Console.WriteLine($"radius beacon stats ({options.ToString()})");
 
-        var hotspotName = EnsureCorrectName(options.Name);
         var minDateTime = DateTime.UtcNow.AddMinutes(-options.PastMinutes);
 
         Console.Write("Fetching hotspots in the radius ... ");
-        var myHotspot = await HotspotService.GetHotspotByName(hotspotName);
+        var myHotspot = await GetHotspotByIdentifier(options.Identifier);
+
         var hotspots = await HotspotService.GetHotspotsByRadius(myHotspot.Lat, myHotspot.Lng, options.Radius);
         Console.WriteLine($"{hotspots.Count()}");
 
@@ -71,22 +69,18 @@ public static class Commands
 
     public static async Task Direction(DirectionOptions options)
     {
-        var hotspotName1 = EnsureCorrectName(options.HotspotName);
-        var hotspotName2 = EnsureCorrectName(options.HotspotName2);
-
-        Console.WriteLine($"direction between {hotspotName1} and {hotspotName2}");
-        var hotspot1 = await HotspotService.GetHotspotByName(hotspotName1);
-        var hotspot2 = await HotspotService.GetHotspotByName(hotspotName2);
+        Console.WriteLine($"direction between {options.Identifier1} and {options.Identifier2}");
+        var hotspot1 = await GetHotspotByIdentifier(options.Identifier1);
+        var hotspot2 = await GetHotspotByIdentifier(options.Identifier2);
 
         Console.WriteLine($"- {hotspot2.ToString()} {Extensions.GetDirectionString(hotspot1, hotspot2)}");
     }
 
     public static async Task Distance(DistanceOptions options)
     {
-        var hotspotName = EnsureCorrectName(options.Name);
         Console.WriteLine($"distance stats ({options.ToString()}) in the last 5 days");
 
-        var myHotspot = await HotspotService.GetHotspotByName(hotspotName);
+        var myHotspot = await GetHotspotByIdentifier(options.Identifier);
         Console.Write("Fetching witnessed ... ");
         var witnessed = await HotspotService.GetWitnessed(myHotspot.Address);
         Console.WriteLine($"{witnessed.Count}");
@@ -99,6 +93,26 @@ public static class Commands
         Console.WriteLine("");
         Console.WriteLine("--- distance statistics ---");
         Console.WriteLine($"total: {witnessedDistances.Count} min: {min} avg: {average} max: {max}");
+    }
+
+    public static async Task Witnessed(WitnessedOptions options)
+    {
+        var minDateTime = DateTime.UtcNow.AddMinutes(-options.PastMinutes);
+        Console.WriteLine($"witnessed stats ({options.ToString()}) in the last 5 days");
+
+        var myHotspot = await GetHotspotByIdentifier(options.Identifier);
+        Console.Write("Fetching witnessed ... ");
+        var witnessed = await HotspotService.GetWitnessedTransactions(myHotspot.Address, minDateTime);
+        Console.WriteLine($"{witnessed.Count}");
+
+        foreach (var transaction in witnessed)
+        {
+            var hotspot = await HotspotService.GetHotspot(transaction.Path[0].Challengee);
+            Console.Write(
+                $"- {hotspot.ToString()} {Extensions.GetDirectionString(myHotspot, hotspot)} - {Extensions.GetRelativeTimeString(transaction.Time)}");
+        }
+
+        Console.WriteLine("");
     }
 
     private static async Task BeaconStats(Hotspot[] hotspots, Hotspot myHotspot, DateTime minTime)
@@ -165,5 +179,15 @@ public static class Commands
     private static string EnsureCorrectName(string name)
     {
         return name.Trim().Replace(' ', '-').ToLower();
+    }
+
+    private static async Task<Hotspot> GetHotspotByIdentifier(string identifier)
+    {
+        if (identifier.Contains(' ') || identifier.Contains('-'))
+        {
+            return await HotspotService.GetHotspotByName(EnsureCorrectName(identifier));
+        }
+
+        return await HotspotService.GetHotspot(identifier);
     }
 }
