@@ -53,7 +53,7 @@ jobs:
         run: dotnet build --no-restore
       # publish
       - name: Publish
-        run: dotnet publish -c Release -p:Version=${{env.releaseVersion}}
+        run: dotnet publish -p:Configuration=Release -p:DebugType=None -p:DebugSymbols=false -p:Version=${{env.releaseVersion}}
       - name: Zip
         run: (cd HeliumCat/bin/Release/net6.0/publish ; rm HeliumCat ; zip -r HeliumCat_v${{env.releaseVersion}}.zip *)
       # create a release
