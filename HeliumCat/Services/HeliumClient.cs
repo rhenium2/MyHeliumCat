@@ -18,7 +18,9 @@ public static class HeliumClient
     private static async Task<HttpResponseMessage> PollyGet(Func<Task<HttpResponseMessage>> func)
     {
         return await Policy
-            .HandleResult<HttpResponseMessage>(TransientHttpFailures)
+            .Handle<HttpRequestException>()
+            .Or<TaskCanceledException>()
+            .OrResult<HttpResponseMessage>(TransientHttpFailures)
             .WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(1 * retryAttempt))
             .ExecuteAsync(func);
     }
