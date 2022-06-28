@@ -21,16 +21,16 @@ public static class HeliumClient
             .Handle<HttpRequestException>()
             .Or<TaskCanceledException>()
             .OrResult<HttpResponseMessage>(TransientHttpFailures)
-            .WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(1 * retryAttempt))
+            .WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromSeconds(3 * retryAttempt))
             .ExecuteAsync(func);
     }
-    
+
     private static bool TransientHttpFailures(HttpResponseMessage responseMessage)
     {
-        return responseMessage.StatusCode == HttpStatusCode.TooManyRequests || 
-               responseMessage.StatusCode == HttpStatusCode.RequestTimeout || 
-               responseMessage.StatusCode == HttpStatusCode.BadGateway || 
-               responseMessage.StatusCode == HttpStatusCode.GatewayTimeout || 
+        return responseMessage.StatusCode == HttpStatusCode.TooManyRequests ||
+               responseMessage.StatusCode == HttpStatusCode.RequestTimeout ||
+               responseMessage.StatusCode == HttpStatusCode.BadGateway ||
+               responseMessage.StatusCode == HttpStatusCode.GatewayTimeout ||
                responseMessage.StatusCode == HttpStatusCode.ServiceUnavailable;
     }
 

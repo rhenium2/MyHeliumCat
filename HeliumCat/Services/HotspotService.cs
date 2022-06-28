@@ -27,6 +27,11 @@ public static class HotspotService
         return hotspots.First();
     }
 
+    /// <summary>
+    /// Retrieves the list of hotspots the given hotspot witnessed over the last 5 days.
+    /// </summary>
+    /// <param name="hotspotId"></param>
+    /// <returns></returns>
     public static async Task<List<Hotspot>> GetWitnessed(string hotspotId)
     {
         var uri = $"/v1/hotspots/{hotspotId}/witnessed";
@@ -49,6 +54,12 @@ public static class HotspotService
         return DeserializeTransaction(firstData);
     }
 
+    /// <summary>
+    /// Lists the challenge (receipts) that the given hotspot was a challenger, challengee or witness in
+    /// </summary>
+    /// <param name="hotspotId"></param>
+    /// <param name="minTime"></param>
+    /// <returns></returns>
     public static async Task<List<PocReceiptsTransaction>> GetChallenges(string hotspotId, DateTime? minTime)
     {
         var uri = $"/v1/hotspots/{hotspotId}/challenges";
@@ -61,7 +72,7 @@ public static class HotspotService
         return Extensions.DeserializeAll<PocReceiptsTransaction>(allData.ToArray());
     }
 
-    public static async Task<List<PocReceiptsTransaction>> GetChallenges(DateTime? minTime)
+    public static async Task<List<PocReceiptsTransaction>> GetNetworkChallenges(DateTime? minTime)
     {
         var uri = $"/v1/challenges";
         if (minTime.HasValue)
@@ -69,8 +80,9 @@ public static class HotspotService
             uri += "?min_time=" + minTime.Value.ToString("o", CultureInfo.InvariantCulture);
         }
 
-        var allData = await HeliumClient.Get(uri);
-        return Extensions.DeserializeAll<PocReceiptsTransaction>(allData.ToArray());
+        var allDataStrings = await HeliumClient.Get(uri);
+        var transactions = Extensions.DeserializeAll<PocReceiptsTransaction>(allDataStrings.ToArray());
+        return transactions;
     }
 
     public static async Task<List<PocReceiptsTransaction>> GetBeaconTransactions(string hotspotId, DateTime? minTime)

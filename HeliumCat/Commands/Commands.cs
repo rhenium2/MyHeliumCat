@@ -76,6 +76,7 @@ public static class Commands
         Console.WriteLine($"- {hotspot2.ToString()} {Extensions.GetDirectionString(hotspot1, hotspot2)}");
     }
 
+    [Obsolete]
     public static async Task Distance(DistanceOptions options)
     {
         Console.WriteLine($"distance stats ({options.ToString()}) in the last 5 days");
@@ -98,27 +99,51 @@ public static class Commands
     public static async Task Witnessed(WitnessedOptions options)
     {
         var minDateTime = DateTime.UtcNow.AddMinutes(-options.PastMinutes);
-        Console.WriteLine($"witnessed stats ({options.ToString()}) in the last 5 days");
+        Console.WriteLine($"witnessed stats ({options.ToString()})");
 
         var myHotspot = await GetHotspotByIdentifier(options.Identifier);
         Console.Write("Fetching witnessed ... ");
         var witnessed = await HotspotService.GetWitnessedTransactions(myHotspot.Address, minDateTime);
         Console.WriteLine($"{witnessed.Count}");
 
+        var witnessedDistances = new List<double>();
+        var witnessedHeights = new List<int>();
         foreach (var transaction in witnessed)
         {
             var hotspot = await HotspotService.GetHotspot(transaction.Path[0].Challengee);
-            Console.Write(
+            witnessedDistances.Add(Extensions.CalculateDistance(myHotspot, hotspot));
+            witnessedHeights.Add(hotspot.Elevation);
+
+            Console.WriteLine(
                 $"- {hotspot.ToString()} {Extensions.GetDirectionString(myHotspot, hotspot)} - {Extensions.GetRelativeTimeString(transaction.Time)}");
         }
 
-        Console.WriteLine("");
+        if (witnessedDistances.Any())
+        {
+            var minDistance = Extensions.ToDistanceText(witnessedDistances.Min());
+            var averageDistance = Extensions.ToDistanceText(witnessedDistances.Average());
+            var maxDistance = Extensions.ToDistanceText(witnessedDistances.Max());
+            Console.WriteLine("");
+            Console.WriteLine("--- distance statistics ---");
+            Console.WriteLine($"min: {minDistance} avg: {averageDistance} max: {maxDistance}");
+        }
+
+        if (witnessedHeights.Any())
+        {
+            var minHeight = Extensions.ToDistanceText(witnessedHeights.Min());
+            var averageHeight = Extensions.ToDistanceText(witnessedHeights.Average());
+            var maxHeight = Extensions.ToDistanceText(witnessedHeights.Max());
+
+            Console.WriteLine("");
+            Console.WriteLine("--- elevation statistics ---");
+            Console.WriteLine($"min: {minHeight} avg: {averageHeight} max: {maxHeight}");
+        }
     }
 
     private static async Task BeaconStats(Hotspot[] hotspots, Hotspot myHotspot, DateTime minTime)
     {
         Console.Write("fetching all beacons in the world ... ");
-        var challenges = await HotspotService.GetChallenges(minTime);
+        var challenges = await HotspotService.GetNetworkChallenges(minTime);
         Console.WriteLine($"{challenges.Count}");
 
         Console.Write("beacons from hotspots ... ");
