@@ -56,7 +56,7 @@ public class Receipt
 
 public class Witness
 {
-    public object Timestamp { get; set; }
+    public long Timestamp { get; set; }
     public double Snr { get; set; }
     public int Signal { get; set; }
     public string PacketHash { get; set; }

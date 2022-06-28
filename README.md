@@ -8,8 +8,7 @@ Current functions:
 * [radius](#radius): beacons in the 360° radius around the hotspot
 * [box](#box): beacons in the witnessed box around the hotspot (the most bottom left and the most top right hotspots) in the last 5 days
 * [direction](#direction): calculates the direction between two hotspots
-* [distance](#distance): distance statistics for the witnessed hotspots in the last 5 days
-* [witnessed](#witnessed): shows witnessed stats of hotspot 
+* [witnessed](#witnessed): shows witnessed stats of hotspot with their distance and height analysis 
 
 ## Usage
 
@@ -51,12 +50,6 @@ dotnet HeliumCat.dll box <hotspot name or address> --past 10
 calculates the direction between two hotspots
 ```
 dotnet HeliumCat.dll direction <hotspot1 name or address> <hotspot2 name or address>
-```
-
-### distance
-distance stats of hotspot witnessed in the last 5 days
-```
-dotnet HeliumCat.dll distance <hotspot name or address>
 ```
 
 ### witnessed

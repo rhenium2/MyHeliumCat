@@ -103,19 +103,22 @@ public static class Commands
 
         var myHotspot = await GetHotspotByIdentifier(options.Identifier);
         Console.Write("Fetching witnessed ... ");
-        var witnessed = await HotspotService.GetWitnessedTransactions(myHotspot.Address, minDateTime);
-        Console.WriteLine($"{witnessed.Count}");
+        var transactions = await HotspotService.GetWitnessedTransactions(myHotspot.Address, minDateTime);
+        Console.WriteLine($"{transactions.Count}");
 
         var witnessedDistances = new List<double>();
         var witnessedHeights = new List<int>();
-        foreach (var transaction in witnessed)
+        foreach (var transaction in transactions)
         {
-            var hotspot = await HotspotService.GetHotspot(transaction.Path[0].Challengee);
+            var hotspotId = transaction.Path[0].Challengee;
+            var witnessed = transaction.Path[0].Witnesses.Single(x => x.Gateway.Equals(myHotspot.Address));
+            var hotspot = await HotspotService.GetHotspot(hotspotId);
+
             witnessedDistances.Add(Extensions.CalculateDistance(myHotspot, hotspot));
             witnessedHeights.Add(hotspot.Elevation);
 
             Console.WriteLine(
-                $"- {hotspot.ToString()} {Extensions.GetDirectionString(myHotspot, hotspot)} - {Extensions.GetRelativeTimeString(transaction.Time)}");
+                $"- {hotspot.ToString()} {Extensions.GetDirectionString(myHotspot, hotspot)} (rssi: {witnessed.Signal}dBm, snr: {witnessed.Snr.ToString("F")}dB, freq: {witnessed.Frequency.ToString("F2")}) - {Extensions.GetRelativeTimeString(transaction.Time)}");
         }
 
         if (witnessedDistances.Any())

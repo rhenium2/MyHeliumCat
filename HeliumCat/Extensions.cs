@@ -69,6 +69,11 @@ public static class Extensions
 
     public static string ToDistanceText(double distance)
     {
+        if (distance >= 1000)
+        {
+            return $"{distance / 1000:F1}km";
+        }
+
         return $"{distance:F1}m";
     }
 

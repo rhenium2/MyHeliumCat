@@ -20,8 +20,6 @@ await parserResult.WithParsedAsync<FrontOptions>(async options =>
 await parserResult.WithParsedAsync<RadiusOptions>(async options => await Commands.RadiusBeaconStats(options));
 await parserResult.WithParsedAsync<BoxOptions>(async options => await Commands.BoxBeaconStats(options));
 await parserResult.WithParsedAsync<DirectionOptions>(async options => await Commands.Direction(options));
-// [Obsolete]
-//await parserResult.WithParsedAsync<DistanceOptions>(async options => await Commands.Distance(options));
 await parserResult.WithParsedAsync<WitnessedOptions>(async options => await Commands.Witnessed(options));
 
 Console.WriteLine("Done");
