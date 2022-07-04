@@ -1,6 +1,6 @@
 # HeliumCat - Helium hotspot utility
 
-I decided to make a .NET Cli application to help me understand helium hotspots more.
+I developed this .NET Cli application to help me understand helium hotspots more.
 It requires [.Net 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) to be installed.
 
 Current functions:
@@ -11,39 +11,32 @@ Current functions:
 * [witnessed](#witnessed): shows witnessed stats of hotspot with their distance and height analysis 
 
 ## Usage
+Notes:
+1. for hotspot, you can use any of:
+   1. hotspot animal name (like _"Angry Purple Tiger"_)
+   2. hotspot snake-case lowercase animal name (like _angry-purple-tiger_)
+   3. hotspot id (Base58 address) as well (like _11cxkqa2PjpJ9YgY9qK3Njn4uSFu6dyK9xV8XE4ahFSqN1YN2db_)
+2. for time, you use any of 
+   1. past minutes (--past-m)
+   2. past hours (--past-h)
+   3. past days (--past-d)
 
 ### front
 beacon stats of hotspots in front semi-circle, in the past _x_ minutes and _y_ kilometers radius 
 ```
-dotnet HeliumCat.dll front <hotspot name or address> --past 10 --radius 5
+dotnet HeliumCat.dll front <hotspot name or address> --past-m 10 --radius 5
 ```
-<details>
-    <summary>example output</summary>
-
-```
-Hello, World!
-Staring Front Semi-Circle Beacon Stats for the past 10 minutes ...
-There are 867 hotspots in front of me, in 30km semi-circle radius
-There has been 1765 beacons in the world
-- dazzling-clear-tardigrade {SenseCAP, 2.8dBi, 0m} (15341.7m/NW/299°) ... beacons: 1, witnessed: 0, missed: 1
-- alert-mossy-woodpecker {Milesight, 5.8dBi, 4m} (18771.2m/SW/243°) ... beacons: 1, witnessed: 1, missed: 0
-
---- beacon statistics ---
-total: 2 , witnessed: 1 , missed: 1
-Done
-```
-</details>
 
 ### radius
 beacon stats of hotspots in a radius
 ```
-dotnet HeliumCat.dll radius <hotspot name or address> --past 10 --radius 5
+dotnet HeliumCat.dll radius <hotspot name or address> --past-h 12 --radius 5
 ```
 
 ### box
 beacon stats of hotspots in box area based on last 5 days witnessed locations
 ```
-dotnet HeliumCat.dll box <hotspot name or address> --past 10
+dotnet HeliumCat.dll box <hotspot name or address> --past-d 1
 ```
 
 ### direction
@@ -55,5 +48,11 @@ dotnet HeliumCat.dll direction <hotspot1 name or address> <hotspot2 name or addr
 ### witnessed
 shows witnessed stats of hotspot
 ```
-dotnet HeliumCat.dll witnessed <hotspot name or address> --past 10
+dotnet HeliumCat.dll witnessed <hotspot name or address> --past-m 30
+```
+```
+dotnet HeliumCat.dll witnessed <hotspot name or address> --past-h 2
+```
+```
+dotnet HeliumCat.dll witnessed <hotspot name or address> --past-d 1
 ```

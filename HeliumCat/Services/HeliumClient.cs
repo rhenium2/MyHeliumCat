@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net;
 using System.Text.Json.Nodes;
 using Polly;
@@ -58,7 +59,11 @@ public static class HeliumClient
             uri += uri.Contains('?') ? $"&cursor={cursor}" : $"?cursor={cursor}";
         }
 
-        var responseMessage = await PollyGet(() => HttpClient.GetAsync(uri));
+        var responseMessage = await PollyGet(() =>
+        {
+            Debug.WriteLine($"{DateTime.Now:T} GET {uri}");
+            return HttpClient.GetAsync(uri);
+        });
         responseMessage.EnsureSuccessStatusCode();
         var content = await responseMessage.Content.ReadAsStringAsync();
 
