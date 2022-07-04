@@ -1,6 +1,8 @@
+using Newtonsoft.Json;
+
 namespace HeliumCat.Responses.Transactions;
 
 public class Transaction
 {
-    public string Type { get; set; }
+    [JsonProperty("type")] public string Type { get; set; }
 }

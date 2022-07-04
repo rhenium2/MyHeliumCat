@@ -3,9 +3,8 @@ using GeoCoordinatePortable;
 using HeliumCat.Responses;
 using HeliumCat.Services;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
-namespace HeliumCat;
+namespace HeliumCat.Helpers;
 
 public static class Extensions
 {
@@ -19,9 +18,10 @@ public static class Extensions
                 continue;
             }
 
-            var settings = new JsonSerializerSettings();
-            settings.ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() };
-            var collection = JsonConvert.DeserializeObject<List<T>>(jsonString, settings);
+            // var settings = new JsonSerializerSettings();
+            // settings.ContractResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() };
+            //var collection = JsonConvert.DeserializeObject<List<T>>(jsonString, settings);
+            var collection = JsonConvert.DeserializeObject<List<T>>(jsonString);
             result.AddRange(collection);
         }
 
@@ -40,7 +40,13 @@ public static class Extensions
     {
         var dateTime = UnixTimeStampToDateTime(UtcSeconds);
         var timeSpan = DateTime.UtcNow - dateTime;
+        var timeSpanText = GetTimeSpanString(timeSpan);
 
+        return $"{timeSpanText} ago";
+    }
+
+    public static string GetTimeSpanString(TimeSpan timeSpan)
+    {
         (string unit, int value) = new Dictionary<string, int>
         {
             { "year(s)", (int)(timeSpan.TotalDays / 365.25) }, //https://en.wikipedia.org/wiki/Year#Intercalation
@@ -52,7 +58,7 @@ public static class Extensions
             { "millisecond(s)", (int)timeSpan.TotalMilliseconds }
         }.First(kvp => kvp.Value > 0);
 
-        return $"{value} {unit} ago";
+        return $"{value} {unit}";
     }
 
     public static decimal GetGain(int gain)
@@ -128,6 +134,13 @@ public static class Extensions
         throw new ArgumentException(d.ToString());
     }
 
+    public static void AddIfNotNull<T>(this List<T> list, Nullable<T> item) where T : struct
+    {
+        if (item.HasValue)
+        {
+            list.Add(item.Value);
+        }
+    }
 
     public static async Task CheckForNewVersion()
     {
@@ -146,5 +159,25 @@ public static class Extensions
     {
         var assemblyName = Assembly.GetExecutingAssembly().GetName();
         Console.WriteLine($"{assemblyName.Name} {assemblyName.Version.ToString(3)}");
+    }
+
+    public static string GetSignalGoodness(int signal, double distance)
+    {
+        if (signal >= -90)
+        {
+            return "Excellent";
+        }
+
+        if (signal < -90 && signal >= -110)
+        {
+            return "Mediocre";
+        }
+
+        if (signal < -110)
+        {
+            return "Poor";
+        }
+
+        return "N/A";
     }
 }
