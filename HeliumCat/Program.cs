@@ -1,8 +1,8 @@
 ﻿using CommandLine;
-using HeliumCat;
 using HeliumCat.CommandOptions;
 using HeliumCat.Commands;
-
+using HeliumCat.Helpers;
+using HeliumCat.Services;
 
 var parserResult =
     Parser.Default
@@ -22,4 +22,6 @@ await parserResult.WithParsedAsync<BoxOptions>(async options => await Commands.B
 await parserResult.WithParsedAsync<DirectionOptions>(async options => await Commands.Direction(options));
 await parserResult.WithParsedAsync<WitnessedOptions>(async options => await Commands.Witnessed(options));
 
-Console.WriteLine("Done");
+CacheService.Default.Dispose();
+Console.WriteLine("");
+Console.WriteLine("Done.");
