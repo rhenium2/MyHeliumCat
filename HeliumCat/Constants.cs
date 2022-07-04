@@ -4,18 +4,36 @@ namespace HeliumCat;
 
 public static class Constants
 {
-    public class TransactionType
+    public static class TransactionType
     {
-        public static string Rewards = "rewards_v2";
-        public static string PocReceipts = "poc_receipts_v2";
-        public static string StateChannelClose = "state_channel_close_v1";
+        public const string RewardsV2 = "rewards_v2";
+        public const string PocReceiptsV2 = "poc_receipts_v2";
+        public const string StateChannelOpen = "state_channel_open_v1";
+        public const string StateChannelClose = "state_channel_close_v1";
+        public const string ValidatorHearbeat = "validator_heartbeat_v1";
+        public const string PriceOracle = "price_oracle_v1";
+        public const string AddGateway = "add_gateway_v1";
+        public const string AssertLocationV2 = "assert_location_v2";
+        public const string Payment = "payment_v1";
+        public const string PaymentV2 = "payment_v2";
+        public const string TransferHotspotV2 = "transfer_hotspot_v2";
+        public const string Routing = "routing_v1";
+        public const string ConsensusGroup = "consensus_group_v1";
+        public const string ConsensusGroupFailure = "consensus_group_failure_v1";
+        public const string Vars = "vars_v1";
     }
 
     // https://github.com/helium/explorer-api/blob/6d4236c753026ceab98326d1fd503a1ecab4c9be/src/helpers/makers.js#L22
     public static Maker[] Makers = new[]
     {
-        new Maker { Name = "Helium Inc", Address = "14fzfjFcHpDR1rTH8BNPvSi5dKBbgxaDnmsVPbCjuq9ENjpZbxh" }, // Helium Inc (old)
-        new Maker { Name = "Helium Inc", Address = "13daGGWvDQyTyHFDCPz8zDSVTWgPNNfJ4oh31Teec4TRWfjMx53" }, // Helium Inc (new)
+        new Maker
+        {
+            Name = "Helium Inc", Address = "14fzfjFcHpDR1rTH8BNPvSi5dKBbgxaDnmsVPbCjuq9ENjpZbxh"
+        }, // Helium Inc (old)
+        new Maker
+        {
+            Name = "Helium Inc", Address = "13daGGWvDQyTyHFDCPz8zDSVTWgPNNfJ4oh31Teec4TRWfjMx53"
+        }, // Helium Inc (new)
         new Maker { Name = "Nebra Ltd", Address = "13Zni1he7KY9pUmkXMhEhTwfUpL9AcEV1m2UbbvFsrU9QPTMgE3" },
         new Maker { Name = "SyncroB.it", Address = "14rb2UcfS9U89QmKswpZpjRCUVCVu1haSyqyGY486EvsYtvdJmR" },
         new Maker { Name = "Bobcat", Address = "14sKWeeYWQWrBSnLGq79uRQqZyw3Ldi7oBdxbF6a54QboTNBXDL" },
