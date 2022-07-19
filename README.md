@@ -1,4 +1,4 @@
-# HeliumCat - Helium hotspot utility
+# MyHeliumCat - Helium hotspot utility
 
 I developed this .NET Cli application to help me understand helium hotspots more.
 It requires [.Net 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) to be installed.
