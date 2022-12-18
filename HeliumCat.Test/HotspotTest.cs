@@ -1,4 +1,4 @@
-using HeliumCat.Responses;
+using HeliumApi.SDK.Responses;
 using Xunit;
 
 namespace HeliumCat.Test;

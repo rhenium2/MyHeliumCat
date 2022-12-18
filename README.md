@@ -1,4 +1,4 @@
-# MyHeliumCat - Helium hotspot utility
+# HeliumCat - Helium hotspot utility
 
 I developed this .NET Cli application to help me understand helium hotspots more.
 It requires [.Net 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) to be installed.
@@ -8,7 +8,8 @@ Current functions:
 * [radius](#radius): beacons in the 360° radius around the hotspot
 * [box](#box): beacons in the witnessed box around the hotspot (the most bottom left and the most top right hotspots) in the last 5 days
 * [direction](#direction): calculates the direction between two hotspots
-* [witnessed](#witnessed): shows witnessed stats of hotspot with their distance and height analysis 
+* [witnessed](#witnessed): shows witnessed stats of hotspot with their distance and height analysis
+* [rewards](#rewards): lists the rewards transaction for a financial year with their respective USD value (based on Helium Price Oracle at the time of the transaction), with the option to get an idea of it in other exchange currencies. This feature is **Only** for information purposes. 
 
 ## Usage
 Notes:
@@ -55,4 +56,13 @@ dotnet HeliumCat.dll witnessed <hotspot name or address> --past-h 2
 ```
 ```
 dotnet HeliumCat.dll witnessed <hotspot name or address> --past-d 1
+```
+
+### rewards
+Lists the rewards transaction for a financial year with their respective USD value (based on Helium Price Oracle at the time of the transaction), with the option to get an idea of it in other exchange currencies. This feature is **Only** for information purposes.
+```
+dotnet HeliumCat.dll rewards <hotspot name or address> --fy 2022
+```
+```
+dotnet HeliumCat.dll rewards <hotspot name or address> --fy 2022 --currency aud
 ```
