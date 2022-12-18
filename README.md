@@ -8,10 +8,10 @@ Current functions:
 * [radius](#radius): beacons in the 360° radius around the hotspot
 * [box](#box): beacons in the witnessed box around the hotspot (the most bottom left and the most top right hotspots) in the last 5 days
 * [direction](#direction): calculates the direction between two hotspots
-* [witnessed](#witnessed): shows witnessed stats of hotspot with their distance and height analysis 
+* [witnessed](#witnessed): shows witnessed stats of hotspot with their distance and height analysis
+* [rewards](#rewards): lists the rewards transaction for a financial year with their respective USD value (based on Helium Price Oracle at the time of the transaction), with the option to get an idea of it in other exchange currencies. This feature is **Only** for information purposes. 
 
-## Usage
-Notes:
+## Usage Notes:
 1. for hotspot, you can use any of:
    1. hotspot animal name (like _"Angry Purple Tiger"_)
    2. hotspot snake-case lowercase animal name (like _angry-purple-tiger_)
@@ -21,6 +21,7 @@ Notes:
    2. past hours (--past-h)
    3. past days (--past-d)
 
+## Usage Examples:
 ### front
 beacon stats of hotspots in front semi-circle, in the past _x_ minutes and _y_ kilometers radius 
 ```
@@ -55,4 +56,13 @@ dotnet HeliumCat.dll witnessed <hotspot name or address> --past-h 2
 ```
 ```
 dotnet HeliumCat.dll witnessed <hotspot name or address> --past-d 1
+```
+
+### rewards
+Lists the rewards transaction for a financial year with their respective USD value (based on Helium Price Oracle at the time of the transaction), with the option to get an idea of it in other exchange currencies. This feature is **Only** for information purposes.
+```
+dotnet HeliumCat.dll rewards <hotspot name or address> --fy 2022
+```
+```
+dotnet HeliumCat.dll rewards <hotspot name or address> --fy 2022 --currency aud
 ```

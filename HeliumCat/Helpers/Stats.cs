@@ -1,3 +1,5 @@
+using HeliumApi.SDK.Helpers;
+
 namespace HeliumCat.Helpers;
 
 public class Stats
@@ -41,7 +43,7 @@ public class Stats
     {
         if (_kind == StatsKind.Distance || _kind == StatsKind.Length)
         {
-            return Extensions.ToDistanceText(num);
+            return HeliumHelpers.ToDistanceText(num);
         }
 
         return num.ToString(format);
