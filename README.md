@@ -11,7 +11,8 @@ Current functions:
 * [witnessed](#witnessed): shows witnessed stats of hotspot with their distance and height analysis
 * [rewards](#rewards): lists the rewards transaction for a financial year with their respective USD value (based on Helium Price Oracle at the time of the transaction), with the option to get an idea of it in other exchange currencies. This feature is **Only** for information purposes. 
 
-## Usage Notes:
+## Usage
+Notes:
 1. for hotspot, you can use any of:
    1. hotspot animal name (like _"Angry Purple Tiger"_)
    2. hotspot snake-case lowercase animal name (like _angry-purple-tiger_)
@@ -21,7 +22,6 @@ Current functions:
    2. past hours (--past-h)
    3. past days (--past-d)
 
-## Usage Examples:
 ### front
 beacon stats of hotspots in front semi-circle, in the past _x_ minutes and _y_ kilometers radius 
 ```
